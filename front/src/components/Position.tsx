@@ -88,6 +88,7 @@ export default function Position() {
       <div>Last price: { info && info['lastPrice'] }</div>
       <div>Bid price: { info && info['bidPrice'] }</div>
       <div>Ask price: { info && info['askPrice'] }</div>
+      <div>Today volume: { info && info['todayVolume'] }</div>
       <div>Volume: { info && info['volume'] }</div>
       <div>Open price: { info && ('openPrice' in info ? info['askPrice']:'closed') }</div>
       <Button disabled={ closeDisabled } variant="outlined" onClick={ closePosition }>Close</Button>

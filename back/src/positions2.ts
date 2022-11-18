@@ -13,6 +13,7 @@ class ResultPosition {
   pnl?: number;
   incrementRules?: any;
   internal!: any[];
+  lastUpdatedAt?: string;
 };
 
 export async function positions2() {
@@ -76,11 +77,31 @@ export async function positions2() {
         let resultInernalOrder = {
           id: order.id,
           status: order.status,
-          quantity: order.quantity
+          shortName: order.symbol.shortName,
+          quantity: order.quantity,
+          updatedAt: order.updatedAt,
         }
         resultPosition.internal.push(resultInernalOrder);
       }
     }
   }
-  return { success: true, positions: result };
+
+  // Compute last updatedAt
+  for (const position of result) {
+    let lastUpdatedAt = null;
+    for (const order of position.internal) {
+      if (lastUpdatedAt == null) {
+        lastUpdatedAt = order.updatedAt;
+      } else {
+        if (lastUpdatedAt < order.updatedAt) {
+          lastUpdatedAt = order.updatedAt
+        }
+      }
+    }
+    position.lastUpdatedAt = lastUpdatedAt;
+  }
+
+  result.sort((a: any, b: any) => a.lastUpdatedAt>b.lastUpdatedAt ? -1 : 1);
+
+  return result;
 }

@@ -17,9 +17,12 @@ export default function Positions() {
 
   useEffect( () => {
     async function action() {
-      const response = await fetch("/api/positions");
+      const response = await fetch("/api/positions2");
       const json = await response.json();
       if (json.success) {
+        for (const position of json.positions) {
+          position['computedStatus'] = computeStatus(position)
+        }
         setPositions(json.positions);
       } else {
         console.log('error')
@@ -47,23 +50,61 @@ export default function Positions() {
     navigate(`/positions/${id}`);
   }
 
-return (
+  function computeStatus(position: any) {
+    let error = false;
+    let pending = false;
+    if (position.internal.length>0) {
+      let quantity = 0;
+      for (let order of position.internal) {
+        console.log(order);
+        if (order.shortName !== position.shortName) {
+          error = true;
+        }
+        if (order.status !== 'open') {
+          pending = true;
+        }
+        quantity += order.quantity;
+      }
+      if (position.quantity !== quantity) {
+        pending = true;
+      }
+    } else {
+      error = true;
+    }
+
+    if (error) {
+      return 'error';
+    } else if (pending) {
+      return 'warning';
+    }
+    return 'ok';
+  }
+
+  function formatDate(str: string) {
+    const i = str.indexOf('T');
+    return str.substring(0, i);
+  }
+
+  return (
     <Table>
       <TableContainer component={Paper}>
         <TableHead>
           <TableRow>
             <TableCell>Symbol</TableCell>
-            <TableCell>#</TableCell>
             <TableCell>Value</TableCell>
+            <TableCell>&Delta;</TableCell>
+            <TableCell>Date</TableCell>
+            <TableCell></TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-        { positions.filter( p => p['position']>0 ).map( position => (
+        { positions.filter( p => p['quantity']>0 ).map( position => (
           <TableRow hover onClick={() => openRow(position['conid'])}>
-            <TableCell>{ position['contractDesc'] }</TableCell>
-            <TableCell>{ position['position'] }</TableCell>
+            <TableCell>{ position['shortName'] }</TableCell>
             <TableCell>{ position['mktValue'] }</TableCell>
-            <TableCell><PositionStatus position={ position }/></TableCell>
+            <TableCell style={{color: position['pnl']>0 ? '#12ad2b' : '#c11b17'}}>{ position['pnl'] }</TableCell>
+            <TableCell>{ formatDate(position['lastUpdatedAt']) }</TableCell>
+            <TableCell><PositionStatus status={ position['computedStatus'] }/></TableCell>
           </TableRow>
         ))}
         </TableBody>

@@ -11,6 +11,18 @@ function toFloat(str: string): number | undefined {
   return parseFloat(str);
 }
 
+function volumeToFloat(str0: string): number | undefined {
+  if (!str0) return undefined;
+  const str = str0.trim();
+  if (str.endsWith('K')) {
+    return volumeToFloat(str.substring(0, str.length - 1))! * 1000;
+  }
+  if (str.endsWith('M')) {
+    return volumeToFloat(str.substring(0, str.length - 1))! * 1000000;
+  }
+  return parseFloat(str);
+}
+
 export async function snapshot(conids: number[]): Promise<any[]> {
   const result: any[] = [];
   if (conids.length === 0) {
@@ -23,7 +35,7 @@ export async function snapshot(conids: number[]): Promise<any[]> {
   let attempts = 0;
   do {
     let changes = 0;
-    const request = await fetch(`https://192.168.0.178:8000/v1/api/iserver/marketdata/snapshot?conids=${strConids}&fields=31,86,84,7295,87`);
+    const request = await fetch(`https://192.168.0.178:8000/v1/api/iserver/marketdata/snapshot?conids=${strConids}&fields=31,86,84,7295,87,7282`);
     const snapshots: any[] = await request.json();
     for (const idx in snapshots) {
       const snapshot = snapshots[idx];
@@ -33,16 +45,18 @@ export async function snapshot(conids: number[]): Promise<any[]> {
         bidPrice: toFloat(snapshot['84']),
         askPrice: toFloat(snapshot['86']),
         openPrice: toFloat(snapshot['7295']),
-        volume: snapshot['87'],
+        todayVolume: volumeToFloat(snapshot['87']),
+        volume: volumeToFloat(snapshot['7282']),
       };
       changes += orderInfo.lastPrice !== undefined ? 1 : 0;
       changes += orderInfo.bidPrice !== undefined ? 1 : 0;
       changes += orderInfo.askPrice !== undefined ? 1 : 0;
       changes += orderInfo.openPrice !== undefined ? 1 : 0;
+      changes += orderInfo.todayVolume !== undefined ? 1 : 0;
       changes += orderInfo.volume !== undefined ? 1 : 0;
       result[idx] = orderInfo;
     }
-    if (changes === 5 * conids.length || attempts === 10) {
+    if (changes === 6 * conids.length || attempts === 10) {
       done = true;
     } else if (changes0 < changes) {
       done = false;

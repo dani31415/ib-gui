@@ -47,7 +47,7 @@ export class IbAPI {
     let attempts = 0;
     do {
       let changes = 0;
-      const request = await fetch(`https://192.168.0.178:8000/v1/api/iserver/marketdata/snapshot?conids=${strConids}&fields=31,86,84`);
+      const request = await fetch(`https://192.168.0.178:8000/v1/api/iserver/marketdata/snapshot?conids=${strConids}&fields=31`);
       if (request.status == 401) {
         throw { message: 'Unauthorized', status: 401};
       }
@@ -56,18 +56,18 @@ export class IbAPI {
         const snapshot = snapshots[idx];
         const orderInfo = {
           lastPrice: this.toFloat(snapshot['31']),
-          bidPrice: this.toFloat(snapshot['84']),
-          askPrice: this.toFloat(snapshot['86']),
+          //bidPrice: this.toFloat(snapshot['84']),
+          //askPrice: this.toFloat(snapshot['86']),
           // openPrice: this.toFloat(snapshot['7295']),
         };
         changes += orderInfo.lastPrice !== undefined ? 1 : 0;
-        changes += orderInfo.bidPrice !== undefined ? 1 : 0;
-        changes += orderInfo.askPrice !== undefined ? 1 : 0;
+        // changes += orderInfo.bidPrice !== undefined ? 1 : 0;
+        // changes += orderInfo.askPrice !== undefined ? 1 : 0;
         // changes += orderInfo.openPrice !== undefined ? 1 : 0;
         result[idx] = orderInfo;
       }
       console.log(changes);
-      if (changes === 3 * conids.length || attempts === 10) {
+      if (changes === 1 * conids.length || attempts === 10) {
         done = true;
       } else if (changes0 < changes) {
         done = false;

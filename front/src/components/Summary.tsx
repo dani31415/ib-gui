@@ -15,7 +15,7 @@ export default function NavBar() {
     alignItems="center"
     sx={{ margin: 10}}>
       <Card>
-        <CardContent>
+        <CardContent style={{textAlign: 'center', fontSize: '120%'}}>
           <JenkinsStatus />
           <PositionsSummary />
         </CardContent>
@@ -24,4 +24,3 @@ export default function NavBar() {
     </Container>
   )
 }
-  
