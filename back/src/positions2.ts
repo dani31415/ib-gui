@@ -16,6 +16,10 @@ class ResultPosition {
   lastUpdatedAt?: string;
 };
 
+function dec(x: number) {
+  return Math.round(x*100)/100;
+}
+
 export async function positions2() {
   // 1. Get open positions
   const ibAPI = new IbAPI();
@@ -42,7 +46,7 @@ export async function positions2() {
       quantity: position['position'],
       hasIbPosition: true,
       mktValue: position['mktValue'],
-      pnl: position['realizedPnl'] + position['unrealizedPnl'],
+      pnl: dec(position['realizedPnl'] + position['unrealizedPnl']),
       incrementRules: position['incrementRules'],
       internal: [],
     };

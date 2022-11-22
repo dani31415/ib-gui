@@ -81,6 +81,7 @@ export default function Positions() {
   }
 
   function formatDate(str: string) {
+    if (str==null) return '';
     const i = str.indexOf('T');
     return str.substring(0, i);
   }
