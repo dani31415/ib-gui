@@ -2,7 +2,6 @@
 /* eslint-disable no-restricted-syntax */
 import fetch from 'node-fetch';
 import { IbAPI } from './ib-api';
-import { snapshot } from './snapshot';
 
 class ResultPosition {
   conid!: number;
@@ -102,6 +101,7 @@ export async function positions2() {
         }
       }
     }
+    if (lastUpdatedAt == null) lastUpdatedAt = ''; // to fix sort
     position.lastUpdatedAt = lastUpdatedAt;
   }
 

@@ -20,6 +20,10 @@ app.get('/sso/Dispatcher*', function(req, res){
   res.redirect('/'); // Redirected to home
 });
 
+app.all("/github-webhook/*", function(req, res) {
+  apiProxy.web(req, res, {target: 'http://192.168.0.150:8080', secure:false});
+});
+
 app.all("/sso/*", function(req, res) {
   apiProxy.web(req, res, {target: 'https://192.168.0.178:8000', secure:false});
 });
