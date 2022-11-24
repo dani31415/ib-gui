@@ -16,6 +16,7 @@ export default function NavBar() {
             <MenuItem component={Link} to='/'>Home</MenuItem>
             <MenuItem component={Link} to='/positions'>Positions</MenuItem>
             <MenuItem component={Link} to='/orders'>Orders</MenuItem>
+            <MenuItem component={Link} to='/simulation'>Sim</MenuItem>
           </MenuList>
         </Toolbar>
       </AppBar>

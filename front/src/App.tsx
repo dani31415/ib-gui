@@ -8,6 +8,7 @@ import Positions from './components/Positions'
 import Position from './components/Position'
 import Orders from './components/Orders'
 import Order from './components/Order'
+import Simulation from "./components/Simulation";
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
               <Route path="positions" element={<Positions />} />
               <Route path="orders/:id" element={<Order />} />
               <Route path="orders" element={<Orders />} />
+              <Route path="simulation" element={<Simulation />} />
             </Route>
           </Routes>
         </header>
