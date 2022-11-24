@@ -77,8 +77,9 @@ export default function Simulation() {
           <TableRow>
             <TableCell>Date</TableCell>
             <TableCell>Sim</TableCell>
-            {detail && <TableCell>At open</TableCell>}
-            {detail && <TableCell>At buy</TableCell>}
+            {detail && <TableCell>Open*</TableCell>}
+            {detail && <TableCell>Last*</TableCell>}
+            {detail && <TableCell>Ask*</TableCell>}
             <TableCell>Actual</TableCell>
             <TableCell>Market</TableCell>
           </TableRow>
@@ -90,12 +91,14 @@ export default function Simulation() {
             <TableCell>{ dec(item['simulation']) }</TableCell>
             {detail && <TableCell>{ dec(item['actualAtOpen']) }</TableCell>}
             {detail && <TableCell>{ dec(item['actualAtBuy']) }</TableCell>}
+            {detail && <TableCell>{ dec(item['askAtBuy']) }</TableCell>}
             <TableCell>{ commissions ? dec(item['actual']):dec(item['actualBeforeCompissions']) }</TableCell>
             <TableCell>{ dec(item['market']) }</TableCell>
           </TableRow>
         ))}
         </TableBody>
       </TableContainer>
+      {detail && <span>* From the selected symbols at order time.</span>}
       <span>{ text }</span>
     </Table>
     </div>

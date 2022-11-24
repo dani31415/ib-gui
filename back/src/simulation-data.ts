@@ -66,6 +66,7 @@ export async function simulationData() {
     }
 
     const actualAtOpen = await connection.query(orderQuery('open_price'), [ min, max ]);
+    const askAtBuy = await connection.query(orderQuery('ask_price_at_buy_order'), [ min, max ]);
     const actualAtBuy = await connection.query(orderQuery('last_price_at_buy_order'), [ min, max ]);
     const actualBeforeCompissions = await connection.query(orderQuery('buy_order_price'), [ min, max ]);
     const actual = await connection.query(orderQuery('buy_position_price'), [ min, max ]);
@@ -75,6 +76,6 @@ export async function simulationData() {
     `, [ min, max ]);
 
     // return {simulation, actualAtOpen, actual, market}
-    const result = transpose( {simulation, actualAtOpen, actualAtBuy, actualBeforeCompissions, actual, market} )
+    const result = transpose( {simulation, actualAtOpen, actualAtBuy, actualBeforeCompissions, actual, askAtBuy, market} )
     return result;
 }
