@@ -7,12 +7,20 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+import FormGroup from '@mui/material/FormGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Checkbox from '@mui/material/Checkbox';
 
 export default function Simulation() {
   const [toggle, setToggle] = useState(true);
   const [simulation, setSimulation] : [any[], any] = useState([]);
   const [text, setText] = useState('');
   const navigate = useNavigate();
+  const [commissions, setCommissions] = useState(false);
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setCommissions(event.target.checked);
+  };
 
   function dec(x: number) {
     return Math.round(x*1000)/1000;
@@ -53,6 +61,10 @@ export default function Simulation() {
   }
 
   return (
+    <div>
+    <FormGroup>
+      <FormControlLabel control={<Checkbox checked={commissions} onChange={handleChange}/>} label="Commissions" />
+    </FormGroup>
     <Table>
       <TableContainer component={Paper}>
         <TableHead>
@@ -72,7 +84,7 @@ export default function Simulation() {
             <TableCell>{ dec(item['simulation']) }</TableCell>
             <TableCell>{ dec(item['actualAtOpen']) }</TableCell>
             <TableCell>{ dec(item['actualAtBuy']) }</TableCell>
-            <TableCell>{ dec(item['actual']) }</TableCell>
+            <TableCell>{ commissions ? dec(item['actual']):dec(item['actualBeforeCompissions']) }</TableCell>
             <TableCell>{ dec(item['market']) }</TableCell>
           </TableRow>
         ))}
@@ -80,5 +92,6 @@ export default function Simulation() {
       </TableContainer>
       <span>{ text }</span>
     </Table>
+    </div>
   )
 }

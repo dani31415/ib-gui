@@ -27,6 +27,18 @@ function transpose(obj: any) {
     return result;
 }
 
+function orderQuery(field: string): string {
+    return `
+    SELECT avg(i2.open/o1.${field}) as gain, date(o1.created_at) as date FROM \`order\` AS o1
+        INNER JOIN period AS p1 ON date(o1.created_at)=p1.date
+        INNER JOIN period AS p2 ON p1.id+1=p2.id
+        INNER JOIN item AS i2 ON i2.date=p2.date AND o1.symbol_id = i2.symbol_id
+        WHERE date(o1.created_at)>=? and date(o1.created_at)<=? and status in ('open', 'closed')
+        GROUP BY date(o1.created_at)
+        ORDER BY date(o1.created_at) DESC
+    `
+}
+
 // https://stackoverflow.com/questions/50093144/mysql-8-0-client-does-not-support-authentication-protocol-requested-by-server
 // ALTER USER 'user' IDENTIFIED WITH mysql_native_password BY 'password';
 export async function simulationData() {
@@ -53,41 +65,16 @@ export async function simulationData() {
         }
     }
 
-    const actualAtOpen = await connection.query(`
-        SELECT avg(i2.open/o1.open_price) as gain, date(o1.created_at) as date FROM \`order\` AS o1
-            INNER JOIN period AS p1 ON date(o1.created_at)=p1.date
-            INNER JOIN period AS p2 ON p1.id=p2.id-1
-            INNER JOIN item AS i2 ON i2.date=p2.date AND o1.symbol_id = i2.symbol_id
-            WHERE date(o1.created_at)>=? and date(o1.created_at)<=? and status in ('open', 'closed')
-            GROUP BY date(o1.created_at)
-            ORDER BY date(o1.created_at) DESC
-    `, [ min, max ]);
-
-    const actualAtBuy = await connection.query(`
-        SELECT avg(i2.open/o1.ask_price_at_buy_order) as gain, date(o1.created_at) as date FROM \`order\` AS o1
-            INNER JOIN period AS p1 ON date(o1.created_at)=p1.date
-            INNER JOIN period AS p2 ON p1.id=p2.id-1
-            INNER JOIN item AS i2 ON i2.date=p2.date AND o1.symbol_id = i2.symbol_id
-            WHERE date(o1.created_at)>=? and date(o1.created_at)<=? and status in ('open', 'closed')
-            GROUP BY date(o1.created_at)
-            ORDER BY date(o1.created_at) DESC
-    `, [ min, max ]);
-
-    const actual = await connection.query(`
-        SELECT avg(i2.open/o1.buy_position_price) as gain, date(o1.created_at) as date FROM \`order\` AS o1
-            INNER JOIN period AS p1 ON date(o1.created_at)=p1.date
-            INNER JOIN period AS p2 ON p1.id=p2.id-1
-            INNER JOIN item AS i2 ON i2.date=p2.date AND o1.symbol_id = i2.symbol_id
-            WHERE date(o1.created_at)>=? and date(o1.created_at)<=? and status in ('open', 'closed')
-            GROUP BY date(o1.created_at)
-            ORDER BY date(o1.created_at) DESC
-    `, [ min, max ]);
+    const actualAtOpen = await connection.query(orderQuery('open_price'), [ min, max ]);
+    const actualAtBuy = await connection.query(orderQuery('last_price_at_buy_order'), [ min, max ]);
+    const actualBeforeCompissions = await connection.query(orderQuery('buy_order_price'), [ min, max ]);
+    const actual = await connection.query(orderQuery('buy_position_price'), [ min, max ]);
 
     const market = await connection.query(`
         SELECT mean as gain, date FROM market.period where date>=? and date<=? order by date desc
     `, [ min, max ]);
 
     // return {simulation, actualAtOpen, actual, market}
-    const result = transpose( {simulation, actualAtOpen, actualAtBuy, actual, market} )
+    const result = transpose( {simulation, actualAtOpen, actualAtBuy, actualBeforeCompissions, actual, market} )
     return result;
 }
