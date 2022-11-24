@@ -17,9 +17,14 @@ export default function Simulation() {
   const [text, setText] = useState('');
   const navigate = useNavigate();
   const [commissions, setCommissions] = useState(false);
+  const [detail, setDetail] = useState(false);
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleCommissions = (event: React.ChangeEvent<HTMLInputElement>) => {
     setCommissions(event.target.checked);
+  };
+
+  const handleDetail = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setDetail(event.target.checked);
   };
 
   function dec(x: number) {
@@ -63,7 +68,8 @@ export default function Simulation() {
   return (
     <div>
     <FormGroup>
-      <FormControlLabel control={<Checkbox checked={commissions} onChange={handleChange}/>} label="Commissions" />
+      <FormControlLabel control={<Checkbox checked={commissions} onChange={handleCommissions}/>} label="Commissions" />
+      <FormControlLabel control={<Checkbox checked={detail} onChange={handleDetail}/>} label="Detail" />
     </FormGroup>
     <Table>
       <TableContainer component={Paper}>
@@ -71,8 +77,8 @@ export default function Simulation() {
           <TableRow>
             <TableCell>Date</TableCell>
             <TableCell>Sim</TableCell>
-            <TableCell>At open</TableCell>
-            <TableCell>At buy</TableCell>
+            {detail && <TableCell>At open</TableCell>}
+            {detail && <TableCell>At buy</TableCell>}
             <TableCell>Actual</TableCell>
             <TableCell>Market</TableCell>
           </TableRow>
@@ -82,8 +88,8 @@ export default function Simulation() {
           <TableRow>
             <TableCell>{ formatDate(item['date']) }</TableCell>
             <TableCell>{ dec(item['simulation']) }</TableCell>
-            <TableCell>{ dec(item['actualAtOpen']) }</TableCell>
-            <TableCell>{ dec(item['actualAtBuy']) }</TableCell>
+            {detail && <TableCell>{ dec(item['actualAtOpen']) }</TableCell>}
+            {detail && <TableCell>{ dec(item['actualAtBuy']) }</TableCell>}
             <TableCell>{ commissions ? dec(item['actual']):dec(item['actualBeforeCompissions']) }</TableCell>
             <TableCell>{ dec(item['market']) }</TableCell>
           </TableRow>
