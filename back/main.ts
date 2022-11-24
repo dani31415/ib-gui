@@ -13,6 +13,8 @@ import { simulationData } from './src/simulation-data';
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
+require('dotenv').config();
+
 const apiProxy = httpProxy.createProxyServer();
 const app = express();
 
@@ -168,6 +170,9 @@ app.get('/positions*', function(req, res) {
   res.sendFile('index.html', {root: __dirname + '/public/'});
 });
 app.get('/orders*', function(req, res) {
+  res.sendFile('index.html', {root: __dirname + '/public/'});
+});
+app.get('/simulation*', function(req, res) {
   res.sendFile('index.html', {root: __dirname + '/public/'});
 });
 

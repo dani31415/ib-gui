@@ -43,15 +43,15 @@ function orderQuery(field: string): string {
 // ALTER USER 'user' IDENTIFIED WITH mysql_native_password BY 'password';
 export async function simulationData() {
     const connection = await mysql.createConnection({
-        host     : 'localhost',
+        host     : '192.168.0.150',
         user     : 'user',
-        password : 'password',
+        password : process.env.DB_PASSWORD,
         database : 'market',
         timezone : 'Z',
       })
     const simulation = await connection.query(`
         SELECT avg(gain) AS gain, period.date FROM simulation_item 
-	        INNER JOIN period ON period.id - 1 = simulation_item.period
+	        INNER JOIN period ON period.id = simulation_item.period + 1
             GROUP by period.date ORDER BY period.date DESC
     `);
     let max = null;
