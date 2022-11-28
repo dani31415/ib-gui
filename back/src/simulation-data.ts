@@ -18,6 +18,7 @@ function transpose(obj: any) {
     for (const masterItem of master) {
         const item: any = {
             date: masterItem['date'],
+            modelName: masterItem['model_name'],
         }
         for (const key of keys) {
             item[key] = findGain(obj[key], masterItem['date'])
@@ -50,9 +51,9 @@ export async function simulationData() {
         timezone : 'Z',
       })
     const simulation = await connection.query(`
-        SELECT avg(gain) AS gain, period.date FROM simulation_item 
+        SELECT avg(gain) AS gain, period.date, model_name FROM simulation_item 
 	        INNER JOIN period ON period.id = simulation_item.period + 1
-            GROUP by period.date ORDER BY period.date DESC
+            GROUP by period.date, model_name ORDER BY period.date DESC
     `);
     let max = null;
     let min = null;

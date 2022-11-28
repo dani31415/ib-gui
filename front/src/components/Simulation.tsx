@@ -82,6 +82,7 @@ export default function Simulation() {
             {detail && <TableCell>Ask*</TableCell>}
             <TableCell>Actual</TableCell>
             <TableCell>Market</TableCell>
+            {detail && <TableCell>Model</TableCell>}
           </TableRow>
         </TableHead>
         <TableBody>
@@ -94,6 +95,7 @@ export default function Simulation() {
             {detail && <TableCell>{ dec(item['askAtBuy']) }</TableCell>}
             <TableCell>{ commissions ? dec(item['actual']):dec(item['actualBeforeCompissions']) }</TableCell>
             <TableCell>{ dec(item['market']) }</TableCell>
+            {detail && <TableCell>{ item['modelName'] }</TableCell>}
           </TableRow>
         ))}
         </TableBody>
