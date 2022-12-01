@@ -78,6 +78,7 @@ export default function Simulation() {
             <TableCell>Date</TableCell>
             <TableCell>Sim</TableCell>
             {detail && <TableCell>Open*</TableCell>}
+            {detail && <TableCell>Start*</TableCell>}
             {detail && <TableCell>Last*</TableCell>}
             {detail && <TableCell>Ask*</TableCell>}
             <TableCell>Actual</TableCell>
@@ -91,9 +92,10 @@ export default function Simulation() {
             <TableCell>{ formatDate(item['date']) }</TableCell>
             <TableCell>{ dec(item['simulation']) }</TableCell>
             {detail && <TableCell>{ dec(item['actualAtOpen']) }</TableCell>}
-            {detail && <TableCell>{ dec(item['actualAtBuy']) }</TableCell>}
+            {detail && <TableCell>{ dec(item['actualAtOrder']) }</TableCell>}
+            {detail && <TableCell style={{fontWeight: 'bold'}}>{ dec(item['actualAtBuy']) }</TableCell>}
             {detail && <TableCell>{ dec(item['askAtBuy']) }</TableCell>}
-            <TableCell>{ commissions ? dec(item['actual']):dec(item['actualBeforeCompissions']) }</TableCell>
+            <TableCell style={{fontWeight: 'bold'}}>{ commissions ? dec(item['actual']):dec(item['actualBeforeCompissions']) }</TableCell>
             <TableCell>{ dec(item['market']) }</TableCell>
             {detail && <TableCell>{ item['modelName'] }</TableCell>}
           </TableRow>
