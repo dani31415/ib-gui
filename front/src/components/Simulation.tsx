@@ -107,9 +107,9 @@ export default function Simulation() {
       <FormControlLabel control={<Checkbox checked={commissions} onChange={handleCommissions}/>} label="Commissions" />
       <FormControlLabel control={<Checkbox checked={detail} onChange={handleDetail}/>} label="Detail" />
     </FormGroup>
-    Actual: <span style={{fontWeight: 'bold'}}>{ dec(total.total) }</span> + { dec(total.market) }
+    Actual: <span style={{fontWeight: 'bold'}}>{ dec(total.total) }</span> + { dec(total.market - 1) }
     <br/>
-    Simulation: <span style={{fontWeight: 'bold'}}>{ dec(total.simulation) }</span> + { dec(total.market) }
+    Simulation: <span style={{fontWeight: 'bold'}}>{ dec(total.simulation) }</span> + { dec(total.market - 1) }
     <Table>
       <TableContainer component={Paper}>
         <TableHead>
