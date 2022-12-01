@@ -109,7 +109,7 @@ export default function Simulation() {
     </FormGroup>
     Actual: <span style={{fontWeight: 'bold'}}>{ dec(total.total) }</span> + { dec(total.market - 1) }
     <br/>
-    Simulation: <span style={{fontWeight: 'bold'}}>{ dec(total.simulation) }</span> + { dec(total.market - 1) }
+    Simulation: <span>{ dec(total.simulation) }</span> + { dec(total.market - 1) }
     <Table>
       <TableContainer component={Paper}>
         <TableHead>
