@@ -18,6 +18,7 @@ export default function Simulation() {
   const navigate = useNavigate();
   const [commissions, setCommissions] = useState(false);
   const [detail, setDetail] = useState(false);
+  const [nDays, setNDays] = useState(false);
 
   const handleCommissions = (event: React.ChangeEvent<HTMLInputElement>) => {
     setCommissions(event.target.checked);
@@ -27,13 +28,22 @@ export default function Simulation() {
     setDetail(event.target.checked);
   };
 
+  const handleNDays = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setNDays(event.target.checked);
+  };
+
   function dec(x: number) {
     return Math.round(x*1000)/1000;
   }
 
   useEffect( () => {
     async function action() {
-      const response = await fetch("/api/simulation");
+      let response;
+      if (nDays) {
+        response = await fetch("/api/simulation2");
+      } else {
+        response = await fetch("/api/simulation");
+      }
       const json = await response.json();
       if (json.success) {
         setSimulation(json.simulation);
@@ -57,7 +67,7 @@ export default function Simulation() {
     }
 
     action().catch(console.error);
-  }, [ toggle ]);
+  }, [ toggle, nDays ]);
 
   function formatDate(str: string) {
     if (str==null) return '';
@@ -68,6 +78,7 @@ export default function Simulation() {
   return (
     <div>
     <FormGroup>
+      <FormControlLabel control={<Checkbox checked={nDays} onChange={handleNDays}/>} label="4 days" />
       <FormControlLabel control={<Checkbox checked={commissions} onChange={handleCommissions}/>} label="Commissions" />
       <FormControlLabel control={<Checkbox checked={detail} onChange={handleDetail}/>} label="Detail" />
     </FormGroup>

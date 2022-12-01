@@ -10,6 +10,7 @@ import { internalOrders } from './src/internal-order';
 import { snapshot } from './src/snapshot';
 import { order, orders } from './src/orders';
 import { simulationData } from './src/simulation-data';
+import { simulationDataN } from './src/simulation-data-n';
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
@@ -164,6 +165,15 @@ app.get('/api/simulation', async (req, res) => {
   }
 });
 
+app.get('/api/simulation2', async (req, res) => {
+  try {
+    console.log('Connection done!');
+    const simulation = await simulationDataN();
+    res.send({success: true, simulation});
+  } catch (ex: any) {
+    res.status(400).send({ error: ex.message ?? 'Error.' });
+  }
+});
 
 app.use(express.static('public'));
 app.get('/positions*', function(req, res) {
