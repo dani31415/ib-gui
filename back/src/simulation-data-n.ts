@@ -40,7 +40,7 @@ function quotient(array: any[]): any[] {
                 id: obj.id,
                 v1: obj.v1,
                 gain: obj.v1 / obj.v0,
-                date: obj.date,
+                date: null,
                 model_name: obj.model_name,
             }
             result.push(current);
@@ -87,6 +87,7 @@ function reduce(array: any[], reduce_func: any): any[] {
             // Accumulative mean
             current.gains.push(obj.gain)
             current.gain = reduce_func(current.gains)
+            current.date = obj.date
         }
         previous = obj;
     }
@@ -154,7 +155,7 @@ export async function simulationDataN() {
     SELECT p.id AS period, p2.id as id, p2.mean as gain, p2.date as date FROM market.period as p 
 	  INNER JOIN period as p2 ON p2.id between p.id and p.id + 3
       where p.date>=? and p.date<=? and p2.mean is not null
-      order by period desc, id desc, date desc
+      order by period desc, date desc
     `, [ min, max ]);
     const market = reduce(marketQueryResult, product);
 

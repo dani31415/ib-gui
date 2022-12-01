@@ -14,7 +14,7 @@ import Checkbox from '@mui/material/Checkbox';
 export default function Simulation() {
   const [toggle, setToggle] = useState(true);
   const [simulation, setSimulation] : [any[], any] = useState([]);
-  const [total, setTotal] = useState({total:0, market:0});
+  const [total, setTotal] = useState({total:0, market:0, simulation:0});
   const [text, setText] = useState('');
   const navigate = useNavigate();
   const [commissions, setCommissions] = useState(false);
@@ -41,9 +41,10 @@ export default function Simulation() {
     let accum = 0;
     let market = 0;
     let n = 0;
+    let simulation = 0;
     for (const item of array) {
       if (item.modelName === 'n010_10_1_2_10_800_prod') {
-      // if (item.modelName === 'm188_prod') {
+      // if (item.modelName === 'n007_13_7_prod') {
         if (item.actualBeforeCompissions && item.market) {
           let w = 1;
           if (item.date.startsWith('2022-11-25')) {
@@ -52,10 +53,11 @@ export default function Simulation() {
           n += w;
           accum += w * (item.actualBeforeCompissions / item.market);
           market += w * item.market;
+          simulation += w * (item.simulation / item.market);
         }
       }
     }
-    setTotal({total: accum/n, market: market/n});
+    setTotal({total: accum/n, market: market/n, simulation: simulation/n});
   }
 
   useEffect( () => {
@@ -105,7 +107,9 @@ export default function Simulation() {
       <FormControlLabel control={<Checkbox checked={commissions} onChange={handleCommissions}/>} label="Commissions" />
       <FormControlLabel control={<Checkbox checked={detail} onChange={handleDetail}/>} label="Detail" />
     </FormGroup>
-    Summary: <span style={{fontWeight: 'bold'}}>{ dec(total.total) }</span> + { dec(total.market) }
+    Actual: <span style={{fontWeight: 'bold'}}>{ dec(total.total) }</span> + { dec(total.market) }
+    <br/>
+    Simulation: <span style={{fontWeight: 'bold'}}>{ dec(total.simulation) }</span> + { dec(total.market) }
     <Table>
       <TableContainer component={Paper}>
         <TableHead>
