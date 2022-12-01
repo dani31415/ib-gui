@@ -47,7 +47,7 @@ export default function Simulation() {
       // if (item.modelName === 'n007_13_7_prod') {
         if (item.actualBeforeCompissions && item.market) {
           let w = 1;
-          if (item.date.startsWith('2022-11-25')) {
+          if (item.date.startsWith('2022-11-25') || item.date.startsWith('2022-11-21')) {
             w = 0.2;
           }
           n += w;
