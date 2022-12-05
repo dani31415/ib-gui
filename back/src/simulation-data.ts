@@ -2,10 +2,10 @@
 /* eslint-disable no-restricted-syntax */
 import mysql from 'promise-mysql'
 
-function findGain(list: any[], date: string): number | null {
+function findGain(list: any[], date: string): {gain: number, count: number} | null {
     for (const obj of list) {
         if (obj['date'].toString() === date.toString()) {
-            return obj['gain'];
+            return {gain: obj['gain'], count: obj['count']};
         }
     }
     return null;
@@ -21,20 +21,23 @@ function transpose(obj: any) {
             modelName: masterItem['model_name'],
         }
         for (const key of keys) {
-            item[key] = findGain(obj[key], masterItem['date'])
+            const gc = findGain(obj[key], masterItem['date'])
+            item[key] = gc?.gain; 
+            item[key + '_count'] = gc?.count;
         }
         result.push(item)
     }
     return result;
 }
 
-function orderQuery(field: string): string {
+function orderQuery(field: string, optimize: boolean): string {
     return `
-    SELECT avg(i2.open/o1.${field}) as gain, date(o1.created_at) as date FROM \`order\` AS o1
+    SELECT avg(i2.open/o1.${field}) as gain, count(*) as count, date(o1.created_at) as date FROM \`order\` AS o1
         INNER JOIN period AS p1 ON date(o1.created_at)=p1.date
         INNER JOIN period AS p2 ON p1.id+1=p2.id
         INNER JOIN item AS i2 ON i2.date=p2.date AND o1.symbol_id = i2.symbol_id
         WHERE date(o1.created_at)>=? and date(o1.created_at)<=? and status in ('open', 'closed')
+            AND (NOT ${optimize} OR o1.last_price_at_buy_order > o1.open_price * 0.99)
         GROUP BY date(o1.created_at)
         ORDER BY date(o1.created_at) DESC
     `
@@ -54,7 +57,7 @@ function orderQuery2(field0: string, field1: string): string {
 
 // https://stackoverflow.com/questions/50093144/mysql-8-0-client-does-not-support-authentication-protocol-requested-by-server
 // ALTER USER 'user' IDENTIFIED WITH mysql_native_password BY 'password';
-export async function simulationData() {
+export async function simulationData(optimize: boolean) {
     const connection = await mysql.createConnection({
         host     : '192.168.0.150',
         user     : 'user',
@@ -78,14 +81,14 @@ export async function simulationData() {
         }
     }
 
-    const actualAtOpen = await connection.query(orderQuery('open_price'), [ min, max ]);
-    const askAtBuy = await connection.query(orderQuery('ask_price_at_buy_order'), [ min, max ]);
-    const actualAtOrder = await connection.query(orderQuery('last_price'), [ min, max ]);
+    const actualAtOpen = await connection.query(orderQuery('open_price', optimize), [ min, max ]);
+    const askAtBuy = await connection.query(orderQuery('ask_price_at_buy_order', optimize), [ min, max ]);
+    const actualAtOrder = await connection.query(orderQuery('last_price', optimize), [ min, max ]);
     // const actualAtOrder = await connection.query(orderQuery2('o1.open_price', 'o1.last_price'), [ min, max ]);
-    const actualAtBuy = await connection.query(orderQuery('last_price_at_buy_order'), [ min, max ]);
+    const actualAtBuy = await connection.query(orderQuery('last_price_at_buy_order', optimize), [ min, max ]);
     // const actualAtBuy = await connection.query(orderQuery2('o1.open_price', 'o1.last_price_at_buy_order'), [ min, max ]);
-    const actualBeforeCompissions = await connection.query(orderQuery('buy_order_price'), [ min, max ]);
-    const actual = await connection.query(orderQuery('buy_position_price'), [ min, max ]);
+    const actualBeforeCompissions = await connection.query(orderQuery('buy_order_price', optimize), [ min, max ]);
+    const actual = await connection.query(orderQuery('buy_position_price', optimize), [ min, max ]);
 
     const market = await connection.query(`
         SELECT mean as gain, date FROM market.period where date>=? and date<=? order by date desc

@@ -158,7 +158,8 @@ app.get('/api/ib/reauthenticate', async (req, res) => {
 app.get('/api/simulation', async (req, res) => {
   try {
     console.log('Connection done!');
-    const simulation = await simulationData();
+    const optimize = req.query.optimize === 'true'
+    const simulation = await simulationData(optimize);
     res.send({success: true, simulation});
   } catch (ex: any) {
     res.status(400).send({ error: ex.message ?? 'Error.' });
@@ -168,7 +169,8 @@ app.get('/api/simulation', async (req, res) => {
 app.get('/api/simulation2', async (req, res) => {
   try {
     console.log('Connection done!');
-    const simulation = await simulationDataN();
+    const optimize = req.query.optimize === 'true'
+    const simulation = await simulationDataN(optimize);
     res.send({success: true, simulation});
   } catch (ex: any) {
     res.status(400).send({ error: ex.message ?? 'Error.' });

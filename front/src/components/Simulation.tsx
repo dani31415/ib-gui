@@ -20,6 +20,7 @@ export default function Simulation() {
   const [commissions, setCommissions] = useState(false);
   const [detail, setDetail] = useState(false);
   const [nDays, setNDays] = useState(false);
+  const [optimize, setOptimize] = useState(false);
 
   const handleCommissions = (event: React.ChangeEvent<HTMLInputElement>) => {
     setCommissions(event.target.checked);
@@ -31,6 +32,10 @@ export default function Simulation() {
 
   const handleNDays = (event: React.ChangeEvent<HTMLInputElement>) => {
     setNDays(event.target.checked);
+  };
+
+  const handleOptimize = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setOptimize(event.target.checked);
   };
 
   function dec(x: number) {
@@ -64,9 +69,9 @@ export default function Simulation() {
     async function action() {
       let response;
       if (nDays) {
-        response = await fetch("/api/simulation2");
+        response = await fetch(`/api/simulation2?optimize=${optimize}`);
       } else {
-        response = await fetch("/api/simulation");
+        response = await fetch(`/api/simulation?optimize=${optimize}`);
       }
       const json = await response.json();
       if (json.success) {
@@ -92,7 +97,7 @@ export default function Simulation() {
     }
 
     action().catch(console.error);
-  }, [ toggle, nDays ]);
+  }, [ toggle, nDays, optimize ]);
 
   function formatDate(str: string) {
     if (str==null) return '';
@@ -105,7 +110,8 @@ export default function Simulation() {
     <FormGroup>
       <FormControlLabel control={<Checkbox checked={nDays} onChange={handleNDays}/>} label="4 days" />
       <FormControlLabel control={<Checkbox checked={commissions} onChange={handleCommissions}/>} label="Commissions" />
-      <FormControlLabel control={<Checkbox checked={detail} onChange={handleDetail}/>} label="Detail" />
+      <FormControlLabel control={<Checkbox checked={detail} onChange={handleDetail}/>} label="Detail" /> 
+      <FormControlLabel control={<Checkbox checked={optimize} onChange={handleOptimize}/>} label="Optimize" />
     </FormGroup>
     Actual: <span style={{fontWeight: 'bold'}}>{ dec(total.total) }</span> + { dec(total.market - 1) }
     <br/>
@@ -121,6 +127,7 @@ export default function Simulation() {
             {detail && <TableCell>Last*</TableCell>}
             {detail && <TableCell>Ask*</TableCell>}
             <TableCell>Actual</TableCell>
+            <TableCell>#</TableCell>
             <TableCell>Market</TableCell>
             {detail && <TableCell>Model</TableCell>}
           </TableRow>
@@ -134,7 +141,12 @@ export default function Simulation() {
             {detail && <TableCell>{ dec(item['actualAtOrder']) }</TableCell>}
             {detail && <TableCell style={{fontWeight: 'bold'}}>{ dec(item['actualAtBuy']) }</TableCell>}
             {detail && <TableCell>{ dec(item['askAtBuy']) }</TableCell>}
-            <TableCell style={{fontWeight: 'bold'}}>{ commissions ? dec(item['actual']):dec(item['actualBeforeCompissions']) }</TableCell>
+            <TableCell style={{fontWeight: 'bold'}}>
+              { commissions ? dec(item['actual']):dec(item['actualBeforeCompissions'])}
+            </TableCell>
+            <TableCell>
+              { commissions ? item['actual_count']:item['actualBeforeCompissions_count']}
+            </TableCell>
             <TableCell>{ dec(item['market']) }</TableCell>
             {detail && <TableCell>{ item['modelName'] }</TableCell>}
           </TableRow>
