@@ -106,6 +106,7 @@ function orderQuery2(field0: string, field1: string, optimize: boolean): string 
         INNER JOIN period AS p2 ON p1.id between p2.id-1-3 and p2.id
         INNER JOIN item AS i2 ON i2.date=p2.date AND o1.symbol_id = i2.symbol_id
         WHERE date(o1.created_at)>=? AND date(o1.created_at)<=? AND status in ('open', 'closed') AND ${field0} is not null AND ${field1} is not null
+            AND (NOT ${optimize} OR o1.last_price > o1.open_price * 1.0)
             AND (NOT ${optimize} OR o1.last_price_at_buy_order > o1.open_price * 1.0)
         GROUP BY i2.date, v0, v1, id, date(o1.created_at), period, period1
         ORDER BY period DESC, id DESC, date DESC

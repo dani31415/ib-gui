@@ -37,7 +37,8 @@ function orderQuery(field: string, optimize: boolean): string {
         INNER JOIN period AS p2 ON p1.id+1=p2.id
         INNER JOIN item AS i2 ON i2.date=p2.date AND o1.symbol_id = i2.symbol_id
         WHERE date(o1.created_at)>=? and date(o1.created_at)<=? and status in ('open', 'closed')
-            AND (NOT ${optimize} OR o1.last_price_at_buy_order > o1.open_price * 0.99)
+            AND (NOT ${optimize} OR o1.last_price > o1.open_price * 1.0)
+            AND (NOT ${optimize} OR o1.last_price_at_buy_order > o1.open_price * 1.0)
         GROUP BY date(o1.created_at)
         ORDER BY date(o1.created_at) DESC
     `
