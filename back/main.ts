@@ -172,7 +172,9 @@ app.get('/api/simulation2', async (req, res) => {
     console.log('Connection done!');
     const optimize1 = req.query.optimize1 === 'true'
     const optimize2 = req.query.optimize2 === 'true'
-    const simulation = await simulationDataN(optimize1, optimize2);
+    const useEarlyStop = req.query.useEarlyStop === 'true'
+    const actualSell = req.query.actualSell === 'true'
+    const simulation = await simulationDataN(optimize1, optimize2, useEarlyStop, actualSell);
     res.send({success: true, simulation});
   } catch (ex: any) {
     res.status(400).send({ error: ex.message ?? 'Error.' });

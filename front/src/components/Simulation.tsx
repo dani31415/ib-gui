@@ -23,6 +23,8 @@ export default function Simulation() {
   const [nDays, setNDays] = useState(false);
   const [optimize1, setOptimize1] = useState(false);
   const [optimize2, setOptimize2] = useState(false);
+  const [sellAtOpen, setSellAtOpen] = useState(false);
+  const [useEarlyStop, setUseEarlyStop] = useState(true);
 
   const handleCommissions = (event: React.ChangeEvent<HTMLInputElement>) => {
     setCommissions(event.target.checked);
@@ -42,6 +44,14 @@ export default function Simulation() {
 
   const handleOptimize2 = (event: React.ChangeEvent<HTMLInputElement>) => {
     setOptimize2(event.target.checked);
+  };
+
+  const handleSellAtOpen = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setSellAtOpen(event.target.checked);
+  };
+
+  const handleUseEarlyStop = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setUseEarlyStop(event.target.checked);
   };
 
   function dec(x: number) {
@@ -75,7 +85,7 @@ export default function Simulation() {
     async function action() {
       let response;
       if (nDays) {
-        response = await fetch(`/api/simulation2?optimize1=${optimize1}&optimize2=${optimize2}`);
+        response = await fetch(`/api/simulation2?optimize1=${optimize1}&optimize2=${optimize2}&actualSell=${!sellAtOpen}&useEarlyStop=${useEarlyStop}`);
       } else {
         response = await fetch(`/api/simulation?optimize1=${optimize1}&optimize2=${optimize2}`);
       }
@@ -103,7 +113,7 @@ export default function Simulation() {
     }
 
     action().catch(console.error);
-  }, [ toggle, nDays, optimize1, optimize2 ]);
+  }, [ toggle, nDays, optimize1, optimize2, sellAtOpen, useEarlyStop ]);
 
   function formatDate(str: string) {
     if (str==null) return '';
@@ -114,7 +124,11 @@ export default function Simulation() {
   return (
     <div>
     <FormGroup>
-      <FormControlLabel control={<Checkbox checked={nDays} onChange={handleNDays}/>} label="4 days" />
+      <Box>
+        <FormControlLabel control={<Checkbox checked={nDays} onChange={handleNDays}/>} label="4 days" />
+        <FormControlLabel control={<Checkbox checked={sellAtOpen} onChange={handleSellAtOpen} disabled={!nDays}/>} label="Open as sell price" />
+        <FormControlLabel control={<Checkbox checked={useEarlyStop} onChange={handleUseEarlyStop} disabled={!nDays}/>} label="Early stop" />
+      </Box>
       <Box>
         <FormControlLabel control={<Checkbox checked={commissions} onChange={handleCommissions}/>} label="Commissions" />
         <FormControlLabel control={<Checkbox checked={detail} onChange={handleDetail}/>} label="Detail" /> 
