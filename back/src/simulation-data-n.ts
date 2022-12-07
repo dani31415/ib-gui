@@ -98,16 +98,19 @@ function reduce(array: any[], reduce_func: any): any[] {
     return result;
 }
 
-// AND (o1.last_price_at_buy_order < o1.open_price * 1.02)
 function orderQuery2(field0: string, field1: string, optimize: boolean): string {
     return `
     SELECT p1.id as period, p2.id as period1, o1.symbol_id as id, ${field0} as v0, ${field1} as v1, date(o1.created_at), i2.date as date FROM \`order\` AS o1
         INNER JOIN period AS p1 ON date(o1.created_at)=p1.date
         INNER JOIN period AS p2 ON p1.id between p2.id-1-3 and p2.id
         INNER JOIN item AS i2 ON i2.date=p2.date AND o1.symbol_id = i2.symbol_id
+
+        INNER JOIN period AS p0 ON p1.id+1=p0.id
+        INNER JOIN item AS i0 ON i0.date=p0.date AND o1.symbol_id = i0.symbol_id
+
         WHERE date(o1.created_at)>=? AND date(o1.created_at)<=? AND status in ('open', 'closed') AND ${field0} is not null AND ${field1} is not null
-            AND (NOT ${optimize} OR o1.last_price > o1.open_price * 1.0)
-            AND (NOT ${optimize} OR o1.last_price_at_buy_order > o1.open_price * 1.0)
+            AND i0.open/o1.open_price>0.9
+            AND (NOT ${optimize} OR o1.last_price/o1.open_price >= 0.999)
         GROUP BY i2.date, v0, v1, id, date(o1.created_at), period, period1
         ORDER BY period DESC, id DESC, date DESC
     `
@@ -120,7 +123,7 @@ async function query(connection: mysql.Connection, field0: string, field1: strin
 
 // https://stackoverflow.com/questions/50093144/mysql-8-0-client-does-not-support-authentication-protocol-requested-by-server
 // ALTER USER 'user' IDENTIFIED WITH mysql_native_password BY 'password';
-export async function simulationDataN(optimize: boolean) {
+export async function simulationDataN(optimize1: boolean, optimize2: boolean) {
     const connection = await mysql.createConnection({
         host     : '192.168.0.150',
         user     : 'user',
@@ -151,12 +154,12 @@ export async function simulationDataN(optimize: boolean) {
 
     // const lastField = 'i2.close';
     const lastField = 'o1.sell_order_price';
-    const actualAtOpen = await query(connection, 'i2.open', lastField, min, max, optimize);
-    const askAtBuy = await query(connection, 'o1.ask_price_at_buy_order', lastField, min, max, optimize);
-    const actualAtOrder = await query(connection, 'o1.last_price', lastField, min, max, optimize);
-    const actualAtBuy = await query(connection, 'o1.last_price_at_buy_order', lastField, min, max, optimize);
-    const actualBeforeCompissions = await query(connection, 'o1.buy_order_price', lastField, min, max, optimize);
-    const actual = await query(connection, 'o1.buy_position_price', 'o1.sell_position_price', min, max, optimize);
+    const actualAtOpen = await query(connection, 'i2.open', lastField, min, max, optimize2);
+    const askAtBuy = await query(connection, 'o1.ask_price_at_buy_order', lastField, min, max, optimize2);
+    const actualAtOrder = await query(connection, 'o1.last_price', lastField, min, max, optimize2);
+    const actualAtBuy = await query(connection, 'o1.last_price_at_buy_order', lastField, min, max, optimize2);
+    const actualBeforeCompissions = await query(connection, 'o1.buy_order_price', lastField, min, max, optimize2);
+    const actual = await query(connection, 'o1.buy_position_price', 'o1.sell_position_price', min, max, optimize2);
 
     const marketQueryResult = await connection.query(`
     SELECT p.id AS period, p2.id as id, p2.mean as gain, p2.date as date FROM market.period as p 
@@ -167,5 +170,16 @@ export async function simulationDataN(optimize: boolean) {
     const market = reduce(marketQueryResult, product);
 
     const result = transpose( {simulation, actualAtOpen, actualAtBuy, actualAtOrder, actualBeforeCompissions, actual, askAtBuy, market} )
+
+    if (optimize1) {
+        for (const r of result) {
+            // last_price / open_price > 1.01
+            // 1/(actualAtOrder / actualAtOpen) > 1.01
+            if (r.actualAtOpen / r.actualAtOrder > 1.01) {
+                r.actualBeforeCompissions = null;
+            }
+        }
+    }
+
     return result;
 }

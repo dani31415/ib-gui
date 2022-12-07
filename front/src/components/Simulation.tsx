@@ -10,6 +10,7 @@ import Paper from '@mui/material/Paper';
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
+import Box from '@mui/material/Box';
 
 export default function Simulation() {
   const [toggle, setToggle] = useState(true);
@@ -20,7 +21,8 @@ export default function Simulation() {
   const [commissions, setCommissions] = useState(false);
   const [detail, setDetail] = useState(false);
   const [nDays, setNDays] = useState(false);
-  const [optimize, setOptimize] = useState(false);
+  const [optimize1, setOptimize1] = useState(false);
+  const [optimize2, setOptimize2] = useState(false);
 
   const handleCommissions = (event: React.ChangeEvent<HTMLInputElement>) => {
     setCommissions(event.target.checked);
@@ -34,8 +36,12 @@ export default function Simulation() {
     setNDays(event.target.checked);
   };
 
-  const handleOptimize = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setOptimize(event.target.checked);
+  const handleOptimize1 = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setOptimize1(event.target.checked);
+  };
+
+  const handleOptimize2 = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setOptimize2(event.target.checked);
   };
 
   function dec(x: number) {
@@ -69,9 +75,9 @@ export default function Simulation() {
     async function action() {
       let response;
       if (nDays) {
-        response = await fetch(`/api/simulation2?optimize=${optimize}`);
+        response = await fetch(`/api/simulation2?optimize1=${optimize1}&optimize2=${optimize2}`);
       } else {
-        response = await fetch(`/api/simulation?optimize=${optimize}`);
+        response = await fetch(`/api/simulation?optimize1=${optimize1}&optimize2=${optimize2}`);
       }
       const json = await response.json();
       if (json.success) {
@@ -97,7 +103,7 @@ export default function Simulation() {
     }
 
     action().catch(console.error);
-  }, [ toggle, nDays, optimize ]);
+  }, [ toggle, nDays, optimize1, optimize2 ]);
 
   function formatDate(str: string) {
     if (str==null) return '';
@@ -109,9 +115,14 @@ export default function Simulation() {
     <div>
     <FormGroup>
       <FormControlLabel control={<Checkbox checked={nDays} onChange={handleNDays}/>} label="4 days" />
-      <FormControlLabel control={<Checkbox checked={commissions} onChange={handleCommissions}/>} label="Commissions" />
-      <FormControlLabel control={<Checkbox checked={detail} onChange={handleDetail}/>} label="Detail" /> 
-      <FormControlLabel control={<Checkbox checked={optimize} onChange={handleOptimize}/>} label="Optimize" />
+      <Box>
+        <FormControlLabel control={<Checkbox checked={commissions} onChange={handleCommissions}/>} label="Commissions" />
+        <FormControlLabel control={<Checkbox checked={detail} onChange={handleDetail}/>} label="Detail" /> 
+      </Box>
+      <Box>
+        <FormControlLabel control={<Checkbox checked={optimize1} onChange={handleOptimize1}/>} label="Optimize 1" />
+        <FormControlLabel control={<Checkbox checked={optimize2} onChange={handleOptimize2}/>} label="Optimize 2" />
+      </Box>
     </FormGroup>
     Actual: <span style={{fontWeight: 'bold'}}>{ dec(total.total) }</span> + { dec(total.market - 1) }
     <br/>
