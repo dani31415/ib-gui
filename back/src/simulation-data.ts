@@ -1,6 +1,6 @@
 /* eslint-disable guard-for-in */
 /* eslint-disable no-restricted-syntax */
-import mysql from 'promise-mysql'
+import getConnection from './connection';
 
 function findGain(list: any[], date: string): {gain: number, count: number} | null {
     for (const obj of list) {
@@ -60,13 +60,7 @@ function orderQuery2(field0: string, field1: string): string {
 // https://stackoverflow.com/questions/50093144/mysql-8-0-client-does-not-support-authentication-protocol-requested-by-server
 // ALTER USER 'user' IDENTIFIED WITH mysql_native_password BY 'password';
 export async function simulationData(optimize1: boolean, optimize2: boolean) {
-    const connection = await mysql.createConnection({
-        host     : '192.168.0.150',
-        user     : 'user',
-        password : process.env.DB_PASSWORD,
-        database : 'market',
-        timezone : 'Z',
-      })
+    const connection = await getConnection();
     const simulation = await connection.query(`
         SELECT avg(gain) AS gain, period.date, model_name FROM simulation_item 
 	        INNER JOIN period ON period.id = simulation_item.period + 1

@@ -1,6 +1,8 @@
 /* eslint-disable guard-for-in */
 /* eslint-disable no-restricted-syntax */
-import mysql from 'promise-mysql'
+import mysql from 'promise-mysql';
+
+import getConnection from './connection';
 
 function findGain(list: any[], date: string): {gain: number|null, count: number|null} {
     for (const obj of list) {
@@ -163,13 +165,7 @@ async function query(connection: mysql.Connection, field0: string, field1: strin
 // https://stackoverflow.com/questions/50093144/mysql-8-0-client-does-not-support-authentication-protocol-requested-by-server
 // ALTER USER 'user' IDENTIFIED WITH mysql_native_password BY 'password';
 export async function simulationDataN(optimize1: boolean, optimize2: boolean, useEarlyStop: boolean, actualSell: boolean) {
-    const connection = await mysql.createConnection({
-        host     : '192.168.0.150',
-        user     : 'user',
-        password : process.env.DB_PASSWORD,
-        database : 'market',
-        timezone : 'Z',
-      })
+    const connection = await getConnection();
     console.log('begin sql')
     const simulationExpanded = await connection.query(`
     SELECT simulation_item.period+1 as period, simulation_item.id, item.open as v0, item.open as v1, period.id as period2, period.date, model_name FROM simulation_item 
