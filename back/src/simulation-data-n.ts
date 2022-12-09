@@ -4,6 +4,8 @@ import mysql from 'promise-mysql';
 
 import getConnection from './connection';
 
+const NDAYS = 4;
+
 function findGain(list: any[], date: string): {gain: number|null, count: number|null} {
     for (const obj of list) {
         if (obj['date'].toString() === date.toString()) {
@@ -145,7 +147,7 @@ function orderQuery2(field0: string, field1: string, optimize: boolean): string 
     return `
     SELECT p1.id as period, p2.id as period1, o1.symbol_id as id, ${field0} as v0, ${field1} as v1, i2.open as v2, date(o1.created_at), i2.date as date FROM \`order\` AS o1
         INNER JOIN period AS p1 ON date(o1.created_at)=p1.date
-        INNER JOIN period AS p2 ON p1.id between p2.id-1-3 and p2.id
+        INNER JOIN period AS p2 ON p1.id between p2.id - ${NDAYS} and p2.id
         INNER JOIN item AS i2 ON i2.date=p2.date AND o1.symbol_id = i2.symbol_id
 
         WHERE date(o1.created_at)>=? AND date(o1.created_at)<=? AND status in ('closed')
@@ -169,7 +171,7 @@ export async function simulationDataN(optimize1: boolean, optimize2: boolean, us
     console.log('begin sql')
     const simulationExpanded = await connection.query(`
     SELECT simulation_item.period+1 as period, simulation_item.id, item.open as v0, item.open as v1, period.id as period2, period.date, model_name FROM simulation_item 
-      INNER JOIN period ON period.id between simulation_item.period + 1 and simulation_item.period + 2 + 3
+      INNER JOIN period ON period.id between simulation_item.period + 1 and simulation_item.period + 1 + ${NDAYS}
       INNER JOIN item ON simulation_item.symbol_id = item.symbol_id and period.date = item.date
       GROUP by simulation_item.period, period.date, model_name, period.id, simulation_item.id 
       ORDER BY simulation_item.period DESC, simulation_item.id, period.date ASC
@@ -202,7 +204,7 @@ export async function simulationDataN(optimize1: boolean, optimize2: boolean, us
 
     const marketQueryResult = await connection.query(`
     SELECT p.id AS period, p2.id as id, p2.mean as gain, p2.date as date FROM market.period as p 
-	  INNER JOIN period as p2 ON p2.id between p.id and p.id + 3
+	  INNER JOIN period as p2 ON p2.id between p.id and p.id + ${NDAYS} - 1
       where p.date>=? and p.date<=? and p2.mean is not null
       order by period desc, date desc
     `, [ min, max ]);

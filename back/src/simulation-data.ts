@@ -33,12 +33,11 @@ function transpose(obj: any) {
 // AND (NOT ${optimize} OR abs(open_price/last_price - 1) < 0.01)
 function orderQuery(field: string, optimize: boolean): string {
     return `
-    SELECT avg(i2.open/o1.${field}) as gain, count(*) as count, date(o1.created_at) as date FROM \`order\` AS o1
+    SELECT avg(GREATEST(i2.open/o1.${field}, 1/1.5)) as gain, count(*) as count, date(o1.created_at) as date FROM \`order\` AS o1
         INNER JOIN period AS p1 ON date(o1.created_at)=p1.date
         INNER JOIN period AS p2 ON p1.id+1=p2.id
         INNER JOIN item AS i2 ON i2.date=p2.date AND o1.symbol_id = i2.symbol_id
         WHERE date(o1.created_at)>=? and date(o1.created_at)<=? and status in ('open', 'closed')
-            AND i2.open/o1.open_price>0.9
             AND (NOT ${optimize} OR o1.last_price/o1.open_price >= 0.999)
         GROUP BY date(o1.created_at)
         ORDER BY date(o1.created_at) DESC
