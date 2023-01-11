@@ -149,7 +149,7 @@ export default function Simulation() {
             <TableCell>Sim</TableCell>
             {detail && <TableCell>Open*</TableCell>}
             {detail && <TableCell>Start*</TableCell>}
-            {detail && <TableCell>Last*</TableCell>}
+            {detail && <TableCell>Order*</TableCell>}
             {detail && <TableCell>Ask*</TableCell>}
             <TableCell>Actual</TableCell>
             <TableCell>#</TableCell>
