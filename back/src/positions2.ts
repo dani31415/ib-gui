@@ -62,7 +62,7 @@ export async function positions2() {
     if (!found) {
       let resultPosition: ResultPosition = {
         conid: parseInt(order.ib_conid),
-        shortName: order.symbol.shortName,
+        shortName: order.symbolSrcName,
         quantity: order.quantity,
         hasIbPosition: false,
         mktValue: undefined,
@@ -80,7 +80,7 @@ export async function positions2() {
         let resultInernalOrder = {
           id: order.id,
           status: order.status,
-          shortName: order.symbol.shortName,
+          shortName: order.symbolSrcName,
           quantity: order.quantity,
           updatedAt: order.updatedAt,
         }
