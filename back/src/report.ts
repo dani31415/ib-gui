@@ -8,7 +8,7 @@ function computeMarketMean(startDate: string, endDate: string, marketMeans: {[da
   const start = DateTime.fromISO(startDate).startOf('day')
   const end = DateTime.fromISO(endDate).startOf('day');
   let mean: number = 1;
-  for (let date = start; date.diff(end).toMillis() <= 0; date = date.plus({day:1})) {
+  for (let date = start; date == start || date.diff(end).toMillis() < 0; date = date.plus({day:1})) {
     const dateStr = date.toISODate();
     if (marketMeans.hasOwnProperty(dateStr)) {
       mean *= marketMeans[dateStr];
@@ -52,7 +52,7 @@ export async function report() {
     for (const order of result[day]) {
       modelName = order.modelName;
       const gain = order.sellOrderPrice / order.buyOrderPrice;
-      if (gain > 0) {
+      if (isFinite(gain) && gain > 0) {
         price += gain;
         count += 1;
         marketMean += computeMarketMean(order.createdAt, order.sellOrderAt, marketMeans);
