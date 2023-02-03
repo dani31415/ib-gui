@@ -9,6 +9,7 @@ import Position from './components/Position'
 import Orders from './components/Orders'
 import Order from './components/Order'
 import Simulation from "./components/Simulation";
+import Report from "./components/Report";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
               <Route path="orders/:id" element={<Order />} />
               <Route path="orders" element={<Orders />} />
               <Route path="simulation" element={<Simulation />} />
+              <Route path="report" element={<Report />} />
             </Route>
           </Routes>
         </header>

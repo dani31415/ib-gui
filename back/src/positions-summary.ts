@@ -26,11 +26,9 @@ export default async function positionsSummary() {
     let gains = 0;
     let quantity = 0;
     for (const idx in data) {
-      if (isFinite(data[idx].lastPrice!) && json[idx].buyPositionPrice) { // might be nan
-        const weight = json[idx].quantity * data[idx].lastPrice!;
-        gains += (data[idx].lastPrice! / json[idx].buyPositionPrice) * weight;
-        quantity += weight;
-        json[idx].lastPrice = data[idx].lastPrice;
+      if (isFinite(data[idx].lastPrice!) && json[idx].buyOrderPrice) { // might be nan
+        gains += data[idx].lastPrice! / json[idx].buyOrderPrice;
+        quantity += 1;
       }
     }
     gains /= quantity;

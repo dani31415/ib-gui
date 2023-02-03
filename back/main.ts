@@ -11,6 +11,7 @@ import { snapshot } from './src/snapshot';
 import { order, orders } from './src/orders';
 import { simulationData } from './src/simulation-data';
 import { simulationDataN } from './src/simulation-data-n';
+import { report } from './src/report';
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
@@ -176,6 +177,16 @@ app.get('/api/simulation2', async (req, res) => {
     const actualSell = req.query.actualSell === 'true'
     const simulation = await simulationDataN(optimize1, optimize2, useEarlyStop, actualSell);
     res.send({success: true, simulation});
+  } catch (ex: any) {
+    res.status(400).send({ error: ex.message ?? 'Error.' });
+  }
+});
+
+app.get('/api/report', async (req, res) => {
+  try {
+    console.log('Connection done!');
+    const reportResult = await report();
+    res.send({success: true, report: reportResult});
   } catch (ex: any) {
     res.status(400).send({ error: ex.message ?? 'Error.' });
   }
