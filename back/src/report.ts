@@ -48,6 +48,8 @@ export async function report() {
     let count = 0;
     let total = 0;
     let marketMean = 0;
+    let failed = 0;
+    let discarded = 0;
     let modelName = null;
     for (const order of result[day]) {
       modelName = order.modelName;
@@ -57,9 +59,17 @@ export async function report() {
         count += 1;
         marketMean += computeMarketMean(order.createdAt, order.sellOrderAt, marketMeans);
       }
-      total += 1;
+      if (order.status !== 'failed' || order.description.indexOf('Cancelled')>=0) {
+        total += 1;
+      }
+      if (order.status === 'failed') {
+        failed += 1;
+      }
+      if (order.status === 'discarded') {
+        discarded += 1;
+      }
     }
-    result2.push({date: day, gain: price/count, marketMean: marketMean/count, count, total, modelName});
+    result2.push({date: day, gain: price/count, marketMean: marketMean/count, count, failed, discarded, total, modelName});
   }
 
   result2.sort( (a:any, b:any) => a.date < b.date ? 1 : -1);

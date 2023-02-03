@@ -116,6 +116,8 @@ export default function Report() {
             <TableCell>Gain</TableCell>
             <TableCell>Mean</TableCell>
             <TableCell>Count</TableCell>
+            <TableCell>Fail*</TableCell>
+            <TableCell>Bad**</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -125,11 +127,18 @@ export default function Report() {
             <TableCell>{ dec(item['gain']) }</TableCell>
             <TableCell>{ dec(item['marketMean']) }</TableCell>
             <TableCell>{ item['count'] }</TableCell>
+            <TableCell>{ item['failed'] }</TableCell>
+            <TableCell>{ item['discarded'] }</TableCell>
           </TableRow>
         ))}
         </TableBody>
       </TableContainer>
       <span>{ text }</span>
     </Table>
+    <div style={ {fontSize: '70%'} }>
+    Fail* - Failed due to market reasons. No seller found.
+    <br />
+    Bad** - Discarded because company does not meet requirements.
+    </div>
   </div>);
 }
