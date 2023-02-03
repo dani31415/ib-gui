@@ -202,6 +202,9 @@ app.get('/orders*', function(req, res) {
 app.get('/simulation*', function(req, res) {
   res.sendFile('index.html', {root: __dirname + '/public/'});
 });
+app.get('/report*', function(req, res) {
+  res.sendFile('index.html', {root: __dirname + '/public/'});
+});
 
 app.listen(30303, () => {
   console.log('server started at http://localhost:30303');
