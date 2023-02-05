@@ -28,7 +28,9 @@ export async function job(name: string) {
     });
     if (result.status === 200) {
       const json = await result.json();
-      const resultLastSuccessfulBuild = await fetch(json.lastSuccessfulBuild.url + '/api/json', {
+      let url = json.lastSuccessfulBuild.url;
+      url = url.replace('broker','192.168.0.150')
+      const resultLastSuccessfulBuild = await fetch(url + '/api/json', {
         headers: {
             Authorization: `Basic ${base64data}`,
           },
