@@ -12,6 +12,7 @@ import { order, orders } from './src/orders';
 import { simulationData } from './src/simulation-data';
 import { simulationDataN } from './src/simulation-data-n';
 import { report } from './src/report';
+import { jobs, job } from './src/jobs';
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
@@ -147,6 +148,26 @@ app.get('/api/jenkins/status', async (req, res) => {
   }
 });
 
+app.get('/api/jenkins/jobs/:name', async (req, res) => {
+  try {
+    console.log('Connection done!');
+    const result = await job(req.params.name);
+    res.send({success: true, job: result});
+  } catch (ex: any) {
+    res.status(400).send({ error: ex.message ?? 'Error.' });
+  }
+});
+
+app.get('/api/jenkins/jobs', async (req, res) => {
+  try {
+    console.log('Connection done!');
+    const jobsResult = await jobs();
+    res.send( {success: true, jobs: jobsResult });
+  } catch (ex: any) {
+    res.status(400).send({ error: ex.message ?? 'Error.' });
+  }
+});
+
 app.get('/api/ib/reauthenticate', async (req, res) => {
   try {
     const result = await ibReauthenticate();
@@ -203,6 +224,10 @@ app.get('/simulation*', function(req, res) {
   res.sendFile('index.html', {root: __dirname + '/public/'});
 });
 app.get('/report*', function(req, res) {
+  res.sendFile('index.html', {root: __dirname + '/public/'});
+});
+
+app.get('/jobs*', function(req, res) {
   res.sendFile('index.html', {root: __dirname + '/public/'});
 });
 

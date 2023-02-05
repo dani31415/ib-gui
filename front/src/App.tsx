@@ -10,6 +10,7 @@ import Orders from './components/Orders'
 import Order from './components/Order'
 import Simulation from "./components/Simulation";
 import Report from "./components/Report";
+import Jobs from "./components/Jobs";
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
               <Route path="orders" element={<Orders />} />
               <Route path="simulation" element={<Simulation />} />
               <Route path="report" element={<Report />} />
+              <Route path="jobs" element={<Jobs />} />
             </Route>
           </Routes>
         </header>
