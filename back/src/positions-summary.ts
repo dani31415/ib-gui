@@ -11,23 +11,31 @@ function getConIds(orders: any[]) {
   return conids;
 }
 
+async function openOrClosingOrders() {
+  const request = await fetch('http://192.168.0.150:8000/orders?status=open');
+  const requestClosing = await fetch('http://192.168.0.150:8000/orders?status=closing');
+  let json = await request.json();
+  const jsonClosing = await requestClosing.json();
+  json = json.concat(jsonClosing);
+  return json;
+}
+
 export default async function positionsSummary() {
   // 1. Get open positions
   const ibAPI = new IbAPI();
   if (!await ibAPI.isAuthenticated()) {
     return { success: false, error: 'Unauthenticated' };
   }
-  const request = await fetch('http://192.168.0.150:8000/orders?status=open');
-  const json = await request.json();
 
-  const conids = getConIds(json);
+  const orders = await openOrClosingOrders();
+  const conids = getConIds(orders);
   try {
     const data = await ibAPI.snapshot(conids);
     let gains = 0;
     let quantity = 0;
     for (const idx in data) {
-      if (isFinite(data[idx].lastPrice!) && json[idx].buyOrderPrice) { // might be nan
-        gains += data[idx].lastPrice! / json[idx].buyOrderPrice;
+      if (isFinite(data[idx].lastPrice!) && orders[idx].buyOrderPrice) { // might be nan
+        gains += data[idx].lastPrice! / orders[idx].buyOrderPrice;
         quantity += 1;
       }
     }

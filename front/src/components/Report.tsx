@@ -90,7 +90,7 @@ export default function Report() {
           <TableRow>
             <TableCell>Model</TableCell>
             <TableCell>Gain</TableCell>
-            <TableCell>Mean</TableCell>
+            <TableCell>Market</TableCell>
             <TableCell>From</TableCell>
           </TableRow>
         </TableHead>
@@ -114,8 +114,8 @@ export default function Report() {
           <TableRow>
             <TableCell>Date</TableCell>
             <TableCell>Gain</TableCell>
-            <TableCell>Mean</TableCell>
-            <TableCell>Count</TableCell>
+            <TableCell>Market</TableCell>
+            <TableCell>Sold</TableCell>
             <TableCell>Fail*</TableCell>
             <TableCell>Bad**</TableCell>
           </TableRow>
