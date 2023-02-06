@@ -11,7 +11,9 @@ function computeMarketMean(startDate: string, endDate: string, marketMeans: {[da
   for (let date = start; date == start || date.diff(end).toMillis() < 0; date = date.plus({day:1})) {
     const dateStr = date.toISODate();
     if (marketMeans.hasOwnProperty(dateStr)) {
-      mean *= marketMeans[dateStr];
+      if (marketMeans[dateStr] > 0) {
+        mean *= marketMeans[dateStr];
+      }
     }
   }
   return mean;
