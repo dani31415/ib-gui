@@ -7,6 +7,10 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+import FormGroup from '@mui/material/FormGroup';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Checkbox from '@mui/material/Checkbox';
+import Box from '@mui/material/Box';
 
 function dec(x: number) {
   return Math.round(x*1000)/1000;
@@ -17,7 +21,14 @@ export default function Report() {
   const [text, setText] = useState('');
   const [modelSummary, setModelSummary] : [any[], any] = useState([]);
   const [report, setReport] : [any[], any] = useState([]);
+  const [taxes, setTaxes] = useState(false);
+  const [commissions, setCommissions] = useState(false);
   const navigate = useNavigate();
+
+  const handleCommissionsAndTaxes = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setCommissions(event.target.checked);
+    setTaxes(event.target.checked);
+  };
 
   function setSummary(report: any[]) {
     let models: any[] = []
@@ -56,7 +67,7 @@ export default function Report() {
 
   useEffect( () => {
     async function action() {
-      const response = await fetch(`/api/report`);
+      const response = await fetch(`/api/report?taxes=${taxes}&commissions=${commissions}`);
       const json = await response.json();
       if (json.success) {
         setReport(json.report);
@@ -81,9 +92,14 @@ export default function Report() {
     }
 
     action().catch(console.error);
-  }, [ toggle ]);
+  }, [ toggle, commissions, taxes ]);
 
   return (<div>
+    <FormGroup>
+      <Box>
+        <FormControlLabel control={<Checkbox checked={commissions && taxes} onChange={handleCommissionsAndTaxes}/>} label="Comissions & taxes" />
+      </Box>
+    </FormGroup>
     <Table>
       <TableContainer component={Paper}>
         <TableHead>

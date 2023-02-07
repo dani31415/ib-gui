@@ -19,7 +19,7 @@ function computeMarketMean(startDate: string, endDate: string, marketMeans: {[da
   return mean;
 }
 
-export async function report() {
+export async function report(taxes: boolean, comsissions: boolean) {
   // 1. Get open positions
   const ibAPI = new IbAPI();
   if (!await ibAPI.isAuthenticated()) {
@@ -55,7 +55,14 @@ export async function report() {
     let modelName = null;
     for (const order of result[day]) {
       modelName = order.modelName;
-      const gain = order.sellOrderPrice / order.buyOrderPrice;
+      let gain = order.sellOrderPrice / order.buyOrderPrice;
+      if (comsissions) {
+        gain = gain * 0.995; // comission
+      }
+      if (taxes && gain>1) {
+        // Taxes
+        gain -= 0.25 * (gain - 1);
+      }
       if (isFinite(gain) && gain > 0) {
         price += gain;
         count += 1;

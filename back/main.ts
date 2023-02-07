@@ -206,7 +206,10 @@ app.get('/api/simulation2', async (req, res) => {
 app.get('/api/report', async (req, res) => {
   try {
     console.log('Connection done!');
-    const reportResult = await report();
+    const taxes = req.query.taxes === 'true'
+    const commissions = req.query.commissions === 'true'
+
+    const reportResult = await report(taxes, commissions);
     res.send({success: true, report: reportResult});
   } catch (ex: any) {
     res.status(400).send({ error: ex.message ?? 'Error.' });
