@@ -13,6 +13,7 @@ class ResultPosition {
   incrementRules?: any;
   internal!: any[];
   lastUpdatedAt?: string;
+  firstCreatedAt?: string;
 };
 
 function dec(x: number) {
@@ -83,6 +84,7 @@ export async function positions2() {
           shortName: order.symbolSrcName,
           quantity: order.quantity,
           updatedAt: order.updatedAt,
+          createdAt: order.createdAt,
         }
         resultPosition.internal.push(resultInernalOrder);
       }
@@ -92,6 +94,7 @@ export async function positions2() {
   // Compute last updatedAt
   for (const position of result) {
     let lastUpdatedAt = null;
+    let firstCreatedAt = null;
     for (const order of position.internal) {
       if (lastUpdatedAt == null) {
         lastUpdatedAt = order.updatedAt;
@@ -100,12 +103,21 @@ export async function positions2() {
           lastUpdatedAt = order.updatedAt
         }
       }
+      if (firstCreatedAt == null) {
+        firstCreatedAt = order.createdAt;
+      } else {
+        if (firstCreatedAt > order.createdAt) {
+          firstCreatedAt = order.createdAt
+        }
+      }
     }
     if (lastUpdatedAt == null) lastUpdatedAt = ''; // to fix sort
+    if (firstCreatedAt == null) firstCreatedAt = ''; // to fix sort
     position.lastUpdatedAt = lastUpdatedAt;
+    position.firstCreatedAt = firstCreatedAt;
   }
 
-  result.sort((a: any, b: any) => a.lastUpdatedAt>b.lastUpdatedAt ? -1 : 1);
+  result.sort((a: any, b: any) => a.firstCreatedAt>b.firstCreatedAt ? -1 : 1);
 
   return result;
 }

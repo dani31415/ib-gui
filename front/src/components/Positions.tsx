@@ -104,7 +104,7 @@ export default function Positions() {
             <TableCell>{ position['shortName'] }</TableCell>
             <TableCell>{ position['mktValue'] }</TableCell>
             <TableCell style={{color: position['pnl']>0 ? '#12ad2b' : '#c11b17'}}>{ position['pnl'] }</TableCell>
-            <TableCell>{ formatDate(position['lastUpdatedAt']) }</TableCell>
+            <TableCell>{ formatDate(position['firstCreatedAt']) }</TableCell>
             <TableCell><PositionStatus status={ position['computedStatus'] }/></TableCell>
           </TableRow>
         ))}
