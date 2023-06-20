@@ -68,7 +68,7 @@ export async function report(taxes: boolean, comsissions: boolean) {
         count += 1;
         marketMean += computeMarketMean(order.createdAt, order.sellOrderAt, marketMeans);
       }
-      if (order.status !== 'failed' || order.description.indexOf('Cancelled')>=0) {
+      if (order.status !== 'failed' || order.description && order.description.indexOf('Cancelled')>=0) {
         total += 1;
       }
       if (order.status === 'failed') {
