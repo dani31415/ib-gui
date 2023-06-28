@@ -35,7 +35,7 @@ export default async function positionsSummary() {
     let quantity = 0;
     for (const idx in data) {
       if (isFinite(data[idx].lastPrice!) && orders[idx].buyOrderPrice) { // might be nan
-        gains += data[idx].lastPrice! / orders[idx].buyOrderPrice;
+        gains += data[idx].lastPrice! / orders[idx].buyPositionPrice;
         quantity += 1;
       }
     }
