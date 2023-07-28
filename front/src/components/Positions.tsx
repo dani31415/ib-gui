@@ -61,7 +61,11 @@ export default function Positions() {
           error = true;
         }
         if (order.status !== 'open') {
-          pending = true;
+          if (order.status === 'closing' && !order.hasSellOrderPrice) {
+            pending = false;
+          } else {
+            pending = true;
+          }
         }
         quantity += order.quantity;
       }
