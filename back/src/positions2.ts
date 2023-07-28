@@ -14,7 +14,7 @@ class ResultPosition {
   internal!: any[];
   lastUpdatedAt?: string;
   firstCreatedAt?: string;
-  hasSellOrderPrice!: boolean;
+  hasSellDesiredPrice!: boolean;
 };
 
 function dec(x: number) {
@@ -50,7 +50,7 @@ export async function positions2() {
       pnl: dec(position['realizedPnl'] + position['unrealizedPnl']),
       incrementRules: position['incrementRules'],
       internal: [],
-      hasSellOrderPrice: false,
+      hasSellDesiredPrice: false,
     };
     result.push(resultPosition);
   }
@@ -72,7 +72,7 @@ export async function positions2() {
         pnl: undefined,
         incrementRules: undefined,
         internal: [],
-        hasSellOrderPrice: order.sellOrderPrice > 0,
+        hasSellDesiredPrice: order.sellDesiredPrice > 0,
       };
       result.push(resultPosition);
     }
@@ -88,7 +88,7 @@ export async function positions2() {
           quantity: order.quantity,
           updatedAt: order.updatedAt,
           createdAt: order.createdAt,
-          hasSellOrderPrice: order.sellOrderPrice > 0,
+          hasSellDesiredPrice: order.sellDesiredPrice > 0,
         }
         resultPosition.internal.push(resultInernalOrder);
       }
@@ -99,9 +99,9 @@ export async function positions2() {
   for (const position of result) {
     let lastUpdatedAt = null;
     let firstCreatedAt = null;
-    let hasSellOrderPrice = false;
+    let hasSellDesiredPrice = position.hasSellDesiredPrice;
     for (const order of position.internal) {
-      hasSellOrderPrice = hasSellOrderPrice || order.hasSellOrderPrice;
+      hasSellDesiredPrice = hasSellDesiredPrice || order.hasSellDesiredPrice;
       if (lastUpdatedAt == null) {
         lastUpdatedAt = order.updatedAt;
       } else {
@@ -121,7 +121,7 @@ export async function positions2() {
     if (firstCreatedAt == null) firstCreatedAt = ''; // to fix sort
     position.lastUpdatedAt = lastUpdatedAt;
     position.firstCreatedAt = firstCreatedAt;
-    position.hasSellOrderPrice = hasSellOrderPrice;
+    position.hasSellDesiredPrice = hasSellDesiredPrice;
   }
 
   result.sort((a: any, b: any) => a.firstCreatedAt>b.firstCreatedAt ? -1 : 1);
