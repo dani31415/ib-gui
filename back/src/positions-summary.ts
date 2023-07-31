@@ -17,7 +17,15 @@ async function openOrClosingOrders() {
   let json = await request.json();
   const jsonClosing = await requestClosing.json();
   json = json.concat(jsonClosing);
-  return json;
+  // filter
+  const result: any[] = []
+  for (const order of json) {
+    // 2412 is a stuck order
+    if (order.id !== 2412) {
+      result.push(order);
+    }
+  }
+  return result;
 }
 
 export default async function positionsSummary() {
@@ -35,7 +43,7 @@ export default async function positionsSummary() {
     let quantity = 0;
     for (const idx in data) {
       if (isFinite(data[idx].lastPrice!) && orders[idx].buyOrderPrice) { // might be nan
-        gains += data[idx].lastPrice! / orders[idx].buyPositionPrice;
+        gains += data[idx].lastPrice! / orders[idx].buyOrderPrice;
         quantity += 1;
       }
     }
