@@ -11,6 +11,7 @@ import Order from './components/Order'
 import Simulation from "./components/Simulation";
 import Report from "./components/Report";
 import Jobs from "./components/Jobs";
+import Train from "./components/Train";
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
               <Route path="simulation" element={<Simulation />} />
               <Route path="report" element={<Report />} />
               <Route path="jobs" element={<Jobs />} />
+              <Route path="train" element={<Train />} />
             </Route>
           </Routes>
         </header>

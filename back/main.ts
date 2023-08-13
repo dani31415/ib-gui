@@ -12,6 +12,7 @@ import { order, orders } from './src/orders';
 import { simulationData } from './src/simulation-data';
 import { simulationDataN } from './src/simulation-data-n';
 import { report } from './src/report';
+import { train } from './src/train';
 import { jobs, job } from './src/jobs';
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
@@ -211,6 +212,17 @@ app.get('/api/report', async (req, res) => {
 
     const reportResult = await report(taxes, commissions);
     res.send({success: true, report: reportResult});
+  } catch (ex: any) {
+    res.status(400).send({ error: ex.message ?? 'Error.' });
+  }
+});
+
+app.get('/api/train', async (req, res) => {
+  try {
+    console.log('Connection done!');
+
+    const trainResult = await train();
+    res.send({success: true, train: trainResult});
   } catch (ex: any) {
     res.status(400).send({ error: ex.message ?? 'Error.' });
   }
