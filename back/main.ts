@@ -217,6 +217,28 @@ app.get('/api/report', async (req, res) => {
   }
 });
 
+app.get('/api/train/process', async (req, res) => {
+  try {
+    console.log('Connection done!');
+
+    const trainResult = await trainProcess();
+    res.send({success: true, train: trainResult});
+  } catch (ex: any) {
+    res.status(400).send({ error: ex.message ?? 'Error.' });
+  }
+});
+
+app.get('/api/train/run', async (req, res) => {
+  try {
+    console.log('Connection done!');
+
+    const trainResult = await trainRun();
+    res.send({success: true, train: trainResult});
+  } catch (ex: any) {
+    res.status(400).send({ error: ex.message ?? 'Error.' });
+  }
+});
+
 app.get('/api/train', async (req, res) => {
   try {
     console.log('Connection done!');
@@ -243,6 +265,10 @@ app.get('/report*', function(req, res) {
 });
 
 app.get('/jobs*', function(req, res) {
+  res.sendFile('index.html', {root: __dirname + '/public/'});
+});
+
+app.get('/train*', function(req, res) {
   res.sendFile('index.html', {root: __dirname + '/public/'});
 });
 

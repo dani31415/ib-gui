@@ -9,6 +9,7 @@ import Paper from '@mui/material/Paper';
 
 export default function Train() {
   const [train, setTrain] = useState([]);
+  const [process, setProcess] = useState('');
   const [text, setText] = useState('');
 
 
@@ -47,12 +48,20 @@ export default function Train() {
       } else {
         setText(json.error);
       }
+      const responseProcess = await fetch(`/api/train/process`);
+      const jsonProcess = await responseProcess.json();
+      if (json.success) {
+        setProcess(jsonProcess.train);
+      } else {
+        setText(json.error);
+      }
     }
 
     action().catch(console.error);
   }, [ ]);
 
   return (<div>
+    Process: {process && process.length > 0 ? process:'not running'}
     <Table>
       <TableContainer component={Paper}>
         <TableHead>
