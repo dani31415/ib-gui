@@ -57,8 +57,7 @@ export default function Train() {
       <TableContainer component={Paper}>
         <TableHead>
           <TableRow>
-            <TableCell>Name</TableCell>
-            <TableCell>Period</TableCell>
+            <TableCell>Name Period</TableCell>
             <TableCell>Time</TableCell>
             <TableCell>Epoch</TableCell>
           </TableRow>
@@ -66,10 +65,9 @@ export default function Train() {
         <TableBody>
         { train.map( t => (
           <TableRow>
-            <TableCell sx={style(t)}>{ t['name'] }{t['variant']}-{t['iteration']}</TableCell>
-            <TableCell sx={style(t)}>{ t['end_period']}</TableCell>
+            <TableCell sx={style(t)}>{ t['name'] }<br></br>{t['end_period']} {t['variant']}-{t['iteration']}</TableCell>
             <TableCell  sx={style(t)}>{ t['modified'] ?? ''}</TableCell>
-            <TableCell  sx={style(t)}>{ t['epoch'] }/{ t['n_epochs'] ? t['n_epochs']-1:'' }</TableCell>
+            <TableCell  sx={style(t)}>{ t['epoch'] }/{ t['n_epochs'] ? t['n_epochs']-1:'' }<br></br>{t['running'] ? '(' + t['seconds'] + 's)':''} </TableCell>
           </TableRow>
         ))}
         </TableBody>
