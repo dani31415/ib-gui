@@ -61,8 +61,12 @@ export default function Train() {
   }, [ ]);
 
   function status(t: any) {
+    return t['epoch'] + '/' + (t['n_epochs'] ? t['n_epochs']-1 : '');
+  }
+
+  function info(t: any) {
     if (t.operation === 'train') {
-      return t['epoch'] + '/' + (t['n_epochs'] ? t['n_epochs']-1 : '');
+      return t['running'] ? '(' + t['seconds'] + 's)' : '';
     } else {
       return 'metrics';
     }
@@ -84,7 +88,7 @@ export default function Train() {
           <TableRow>
             <TableCell sx={style(t)}>{ t['name'] }<br></br>{t['end_period']} {t['variant']}-{t['iteration']}</TableCell>
             <TableCell  sx={style(t)}>{ t['modified'] ?? ''}</TableCell>
-            <TableCell  sx={style(t)}>{ status(t) }<br></br>{t['running'] ? '(' + t['seconds'] + 's)':''} </TableCell>
+            <TableCell  sx={style(t)}>{ status(t) }<br></br>{ info(t) } </TableCell>
           </TableRow>
         ))}
         </TableBody>
