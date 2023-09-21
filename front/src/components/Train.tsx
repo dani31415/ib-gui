@@ -60,6 +60,14 @@ export default function Train() {
     action().catch(console.error);
   }, [ ]);
 
+  function status(t: any) {
+    if (t.operation === 'train') {
+      return t['epoch'] + '/' + (t['n_epochs'] ? t['n_epochs']-1 : '');
+    } else {
+      return 'metrics';
+    }
+  }
+
   return (<div>
     Process: {process && process.length > 0 ? process:'not running'}
     <Table>
@@ -76,7 +84,7 @@ export default function Train() {
           <TableRow>
             <TableCell sx={style(t)}>{ t['name'] }<br></br>{t['end_period']} {t['variant']}-{t['iteration']}</TableCell>
             <TableCell  sx={style(t)}>{ t['modified'] ?? ''}</TableCell>
-            <TableCell  sx={style(t)}>{ t['epoch'] }/{ t['n_epochs'] ? t['n_epochs']-1:'' }<br></br>{t['running'] ? '(' + t['seconds'] + 's)':''} </TableCell>
+            <TableCell  sx={style(t)}>{ status(t) }<br></br>{t['running'] ? '(' + t['seconds'] + 's)':''} </TableCell>
           </TableRow>
         ))}
         </TableBody>
