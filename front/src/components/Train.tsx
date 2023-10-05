@@ -21,6 +21,7 @@ export default function Train() {
   const [text, setText] = useState('');
   const [openSummaryDialog, setOpenSummaryDialog] = useState(false);
 
+  const ellipsis = {width:'125px', display:'block', textOverflow:'ellipsis', overflow:'hidden'};
 
   function order(train: any[]): any[] {
     const r: any[] = []
@@ -109,7 +110,7 @@ export default function Train() {
       <TableContainer component={Paper}>
         <TableHead>
           <TableRow>
-            <TableCell>Name Period</TableCell>
+            <TableCell sx={ellipsis}>Name Period</TableCell>
             <TableCell>Best</TableCell>
             <TableCell>Mean</TableCell>
             <TableCell>Market</TableCell>
@@ -118,11 +119,10 @@ export default function Train() {
         <TableBody>
         { summary.map( t => (
           <TableRow onClick={() => showSummaryDialog(t)}>
-            <TableCell>{ t['name'] }<br></br>{ t['min_period'] }-{ t['max_period'] }</TableCell>
+            <TableCell sx={ellipsis}>{ t['name'] }<br></br>{ t['min_period'] }-{ t['max_period'] }</TableCell>
             <TableCell>{ dec(t['best_best']) }</TableCell>
             <TableCell>{ dec(t['mean_best']) }</TableCell>
             <TableCell>{ dec(t['interday_market']) }</TableCell>
-            <TableCell></TableCell>
           </TableRow>
         ))}
         </TableBody>
@@ -162,7 +162,7 @@ export default function Train() {
               Epoch range: { summaryLine.epoch_start}-{ summaryLine.epoch_end}
             </p>
             <Table>
-              <TableContainer component={Paper}>
+              <TableContainer>
                 <TableHead>
                   <TableRow>
                     <TableCell>Period</TableCell>
