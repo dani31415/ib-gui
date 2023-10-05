@@ -164,15 +164,17 @@ export default function Train() {
               <TableContainer component={Paper}>
                 <TableHead>
                   <TableRow>
-                    <TableCell>Name Period</TableCell>
+                    <TableCell>Period</TableCell>
                     <TableCell>Best</TableCell>
+                    <TableCell>Mean</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                { Object.keys(summaryLine.best_best_list).map( x => (
+                { summaryLine.best_best_list && Object.keys(summaryLine.best_best_list).map( x => (
                   <TableRow>
                     <TableCell>{x}</TableCell>
                     <TableCell>{dec(summaryLine.best_best_list[x])}</TableCell>
+                    <TableCell>{dec(summaryLine.best_mean_list[x])}</TableCell>
                   </TableRow>
                 ))}
                 </TableBody>
