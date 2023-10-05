@@ -112,16 +112,17 @@ export default function Train() {
             <TableCell>Name Period</TableCell>
             <TableCell>Best</TableCell>
             <TableCell>Mean</TableCell>
-            <TableCell>Periods</TableCell>
+            <TableCell>Market</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
         { summary.map( t => (
           <TableRow onClick={() => showSummaryDialog(t)}>
-            <TableCell>{ t['name'] }</TableCell>
+            <TableCell>{ t['name'] }<br></br>{ t['min_period'] }-{ t['max_period'] }</TableCell>
             <TableCell>{ dec(t['best_best']) }</TableCell>
             <TableCell>{ dec(t['mean_best']) }</TableCell>
-            <TableCell>{ t['min_period'] }-{ t['max_period'] }</TableCell>
+            <TableCell>{ dec(t['interday_market']) }</TableCell>
+            <TableCell></TableCell>
           </TableRow>
         ))}
         </TableBody>
@@ -167,6 +168,7 @@ export default function Train() {
                     <TableCell>Period</TableCell>
                     <TableCell>Best</TableCell>
                     <TableCell>Mean</TableCell>
+                    <TableCell>Market</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -175,6 +177,7 @@ export default function Train() {
                     <TableCell>{x}</TableCell>
                     <TableCell>{dec(summaryLine.best_best_list[x])}</TableCell>
                     <TableCell>{dec(summaryLine.best_mean_list[x])}</TableCell>
+                    <TableCell>{dec(summaryLine.interday_market_list[x])}</TableCell>
                   </TableRow>
                 ))}
                 </TableBody>
