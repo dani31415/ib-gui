@@ -6,11 +6,20 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogActions from '@mui/material/DialogActions';
+import Button from '@mui/material/Button';
 
 export default function Train() {
   const [train, setTrain] = useState([]);
   const [process, setProcess] = useState('');
+  const [summary, setSummary] = useState([]);
+  const [summaryLine, setSummaryLine] = useState<any>({});
   const [text, setText] = useState('');
+  const [openSummaryDialog, setOpenSummaryDialog] = useState(false);
 
 
   function order(train: any[]): any[] {
@@ -48,6 +57,15 @@ export default function Train() {
       } else {
         setText(json.error);
       }
+      const responseSummary = await fetch(`/api/train/summary`);
+      const jsonSummary = await responseSummary.json();
+      if (json.success) {
+        var train: any[] = jsonSummary.summary
+        train = order(train)
+        setSummary(train as never[]);
+      } else {
+        setText(json.error);
+      }
       const responseProcess = await fetch(`/api/train/process`);
       const jsonProcess = await responseProcess.json();
       if (json.success) {
@@ -72,8 +90,43 @@ export default function Train() {
     }
   }
 
+  function showSummaryDialog(summaryLine: any) {
+    setSummaryLine(summaryLine);
+    setOpenSummaryDialog(true);
+  }
+
+  function closeSummaryDialog() {
+    setOpenSummaryDialog(false);
+  }
+
+  function dec(x: number) {
+    return Math.round(x*10000)/10000;
+  }
+
   return (<div>
     Process: {process && process.length > 0 ? process:'not running'}
+    <Table>
+      <TableContainer component={Paper}>
+        <TableHead>
+          <TableRow>
+            <TableCell>Name Period</TableCell>
+            <TableCell>Best</TableCell>
+            <TableCell>Mean</TableCell>
+            <TableCell>Periods</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+        { summary.map( t => (
+          <TableRow onClick={() => showSummaryDialog(t)}>
+            <TableCell>{ t['name'] }</TableCell>
+            <TableCell>{ dec(t['best_best']) }</TableCell>
+            <TableCell>{ dec(t['mean_best']) }</TableCell>
+            <TableCell>{ t['min_period'] }-{ t['max_period'] }</TableCell>
+          </TableRow>
+        ))}
+        </TableBody>
+      </TableContainer>
+    </Table>
     <Table>
       <TableContainer component={Paper}>
         <TableHead>
@@ -93,8 +146,43 @@ export default function Train() {
         ))}
         </TableBody>
       </TableContainer>
-      <span>{ text }</span>
     </Table>
-
-  </div>)
+    <span>{ text }</span>
+    <Dialog
+        open={openSummaryDialog}
+        onClose={ closeSummaryDialog }
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{ summaryLine.name }</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            <p>
+              Epoch range: { summaryLine.epoch_start}-{ summaryLine.epoch_end}
+            </p>
+            <Table>
+              <TableContainer component={Paper}>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Name Period</TableCell>
+                    <TableCell>Best</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                { Object.keys(summaryLine.best_best_list).map( x => (
+                  <TableRow>
+                    <TableCell>{x}</TableCell>
+                    <TableCell>{dec(summaryLine.best_best_list[x])}</TableCell>
+                  </TableRow>
+                ))}
+                </TableBody>
+              </TableContainer>
+            </Table>
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={closeSummaryDialog} autoFocus>Ok</Button>
+        </DialogActions>
+      </Dialog>
+   </div>)
 }

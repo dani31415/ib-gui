@@ -21,6 +21,12 @@ export async function train() {
     return JSON.parse(s);
 }
 
+export async function trainSummary() {
+    await connect();
+    const s = await ssh.exec('cat',['.tmp/summary.json'],{ cwd: '/home/user/trading' })
+    return JSON.parse(s);
+}
+
 export async function trainProcess() {
     await connect();
     const s = await ssh.exec('bash', ['-c', 'ps -ef | grep train.py | grep -v grep']);

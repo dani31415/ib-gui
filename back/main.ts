@@ -12,7 +12,7 @@ import { order, orders } from './src/orders';
 import { simulationData } from './src/simulation-data';
 import { simulationDataN } from './src/simulation-data-n';
 import { report } from './src/report';
-import { train } from './src/train';
+import { train, trainProcess, trainRun, trainSummary } from './src/train';
 import { jobs, job } from './src/jobs';
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
@@ -23,8 +23,18 @@ const apiProxy = httpProxy.createProxyServer();
 const app = express();
 
 app.get('/sso/Dispatcher*', function(req, res){
+  console.log('GET dispatch');
   apiProxy.web(req, res, {target: 'https://192.168.0.178:8000', secure:false});
   res.redirect('/'); // Redirected to home
+});
+
+app.post('/sso/Dispatcher*', function(req, res){
+  console.log('POST dispatch');
+  console.log(req.hostname);
+  console.log(req.url);
+  console.log(req.headers);
+  apiProxy.web(req, res, {target: 'https://192.168.0.178:8000', secure:false});
+  // res.redirect('/'); // Redirected to home
 });
 
 app.all("/github-webhook/*", function(req, res) {
@@ -32,6 +42,19 @@ app.all("/github-webhook/*", function(req, res) {
 });
 
 app.all("/sso/*", function(req, res) {
+  console.log(req.hostname);
+  apiProxy.web(req, res, {target: 'https://192.168.0.178:8000', secure:false});
+});
+
+app.all("/css/*", function(req, res) {
+  apiProxy.web(req, res, {target: 'https://192.168.0.178:8000', secure:false});
+});
+
+app.all("/fonts/*", function(req, res) {
+  apiProxy.web(req, res, {target: 'https://192.168.0.178:8000', secure:false});
+});
+
+app.all("/en/*", function(req, res) {
   apiProxy.web(req, res, {target: 'https://192.168.0.178:8000', secure:false});
 });
 
@@ -234,6 +257,17 @@ app.get('/api/train/run', async (req, res) => {
 
     const trainResult = await trainRun();
     res.send({success: true, train: trainResult});
+  } catch (ex: any) {
+    res.status(400).send({ error: ex.message ?? 'Error.' });
+  }
+});
+
+app.get('/api/train/summary', async (req, res) => {
+  try {
+    console.log('Connection done!');
+
+    const trainResult = await trainSummary();
+    res.send({success: true, summary: trainResult});
   } catch (ex: any) {
     res.status(400).send({ error: ex.message ?? 'Error.' });
   }
