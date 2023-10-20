@@ -100,11 +100,31 @@ export default function Train() {
     setOpenSummaryDialog(false);
   }
 
-  function dec(x: number) {
-    return Math.round(x*10000)/10000;
+  function dec3(x: number) {
+    const y = Math.round(x*1000)/1000;
+    let s = y.toString();
+    if (s.length === 1) {
+      s += '.';
+    }
+    while (s.length < 5) {
+      s += '0';
+    }
+    return s;
   }
 
-  return (<div>
+  function dec4(x: number) {
+    const y = Math.round(x*10000)/10000;
+    let s = y.toString();
+    if (s.length === 1) {
+      s += '.';
+    }
+    while (s.length < 6) {
+      s += '0';
+    }
+    return s;
+  }
+
+return (<div>
     Process: {process && process.length > 0 ? process:'not running'}
     <Table>
       <TableContainer component={Paper}>
@@ -120,9 +140,9 @@ export default function Train() {
         { summary.map( t => (
           <TableRow onClick={() => showSummaryDialog(t)}>
             <TableCell sx={ellipsis}>{ t['name'] }<br></br>{ t['min_period'] }-{ t['max_period'] }</TableCell>
-            <TableCell>{ dec(t['best_best']) }</TableCell>
-            <TableCell>{ dec(t['mean_best']) }</TableCell>
-            <TableCell>{ dec(t['interday_market']) }</TableCell>
+            <TableCell>{ dec4(t['real']) }</TableCell>
+            <TableCell>{ dec4(t['mean_best']) }</TableCell>
+            <TableCell>{ dec4(t['interday_market']) }</TableCell>
           </TableRow>
         ))}
         </TableBody>
@@ -166,6 +186,7 @@ export default function Train() {
                 <TableHead>
                   <TableRow>
                     <TableCell>Period</TableCell>
+                    <TableCell>Real</TableCell>
                     <TableCell>Best</TableCell>
                     <TableCell>Mean</TableCell>
                     <TableCell>Market</TableCell>
@@ -175,9 +196,10 @@ export default function Train() {
                 { summaryLine.best_best_list && Object.keys(summaryLine.best_best_list).map( x => (
                   <TableRow>
                     <TableCell>{x}</TableCell>
-                    <TableCell>{dec(summaryLine.best_best_list[x])}</TableCell>
-                    <TableCell>{dec(summaryLine.best_mean_list[x])}</TableCell>
-                    <TableCell>{dec(summaryLine.interday_market_list[x])}</TableCell>
+                    <TableCell>{dec3(summaryLine.real_list[x])}</TableCell>
+                    <TableCell>{dec3(summaryLine.best_best_list[x])}</TableCell>
+                    <TableCell>{dec3(summaryLine.best_mean_list[x])}</TableCell>
+                    <TableCell>{dec3(summaryLine.interday_market_list[x])}</TableCell>
                   </TableRow>
                 ))}
                 </TableBody>
