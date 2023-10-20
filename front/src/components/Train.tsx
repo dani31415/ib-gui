@@ -198,11 +198,20 @@ return (<div>
                     <TableCell>{x}</TableCell>
                     <TableCell>{dec3(summaryLine.real_list[x])}</TableCell>
                     <TableCell>{dec3(summaryLine.best_best_list[x])}</TableCell>
-                    <TableCell>{dec3(summaryLine.best_mean_list[x])}</TableCell>
+                    <TableCell>{dec3(summaryLine.mean_best_list[x])}</TableCell>
                     <TableCell>{dec3(summaryLine.interday_market_list[x])}</TableCell>
                   </TableRow>
                 ))}
                 </TableBody>
+                <TableHead>
+                  <TableRow>
+                    <TableCell sx={{fontWeight:'bold'}}>Total</TableCell>
+                    <TableCell sx={{fontWeight:'bold'}}>{dec3(summaryLine.real)}</TableCell>
+                    <TableCell sx={{fontWeight:'bold'}}>{dec3(summaryLine.best_best)}</TableCell>
+                    <TableCell sx={{fontWeight:'bold'}}>{dec3(summaryLine.mean_best)}</TableCell>
+                    <TableCell sx={{fontWeight:'bold'}}>{dec3(summaryLine.interday_market)}</TableCell>
+                  </TableRow>
+                </TableHead>
               </TableContainer>
             </Table>
           </DialogContentText>
