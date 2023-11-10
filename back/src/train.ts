@@ -6,7 +6,8 @@ const ssh = new NodeSSH()
 async function connect() {
     if (!ssh.isConnected()) {
         await ssh.connect({
-            host: '192.168.0.134',
+            // host: '192.168.0.134',
+            host: '192.168.0.159',
             username: 'user',
             // privateKeyPath: 'C:\\Users\\dani3\\.ssh\\id_rsa',
             privateKeyPath: 'id_rsa',
