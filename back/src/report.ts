@@ -38,14 +38,15 @@ export async function report(taxes: boolean, comsissions: boolean) {
   const result: any = {};
 
   for (const order of orders) {
-    if (!result.hasOwnProperty(order.date)) {
-      result[order.date] = [];
+    const key = order.date.toString() + ' ' + order.modelName;
+    if (!result.hasOwnProperty(key)) {
+      result[key] = [];
     }
-    result[order.date].push(order);
+    result[key].push(order);
   }
 
   const result2: any = [];
-  for (const day in result) {
+  for (const key in result) {
     let price = 0;
     let count = 0;
     let total = 0;
@@ -53,7 +54,9 @@ export async function report(taxes: boolean, comsissions: boolean) {
     let failed = 0;
     let discarded = 0;
     let modelName = null;
-    for (const order of result[day]) {
+    let date = null;
+    for (const order of result[key]) {
+      date = order.date;
       modelName = order.modelName;
       let gain = order.sellOrderPrice / order.buyOrderPrice;
       if (comsissions) {
@@ -78,7 +81,7 @@ export async function report(taxes: boolean, comsissions: boolean) {
         discarded += 1;
       }
     }
-    result2.push({date: day, gain: price/count, marketMean: marketMean/count, count, failed, discarded, total, modelName});
+    result2.push({date, gain: price/count, marketMean: marketMean/count, count, failed, discarded, total, modelName});
   }
 
   result2.sort( (a:any, b:any) => a.date < b.date ? 1 : -1);

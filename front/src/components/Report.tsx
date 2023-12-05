@@ -30,21 +30,33 @@ export default function Report() {
     setTaxes(event.target.checked);
   };
 
+  function findModelName(models: any[], line: any) : any {
+    for (const model of models) {
+      if (model.modelName === line.modelName) {
+        return model;
+      }
+    }
+    return null
+  }
+
   function setSummary(report: any[]) {
     let models: any[] = []
     let data: any = null;
 
     for (const line of report) {
       if (data === null || data.modelName !== line.modelName) {
-        data = {
-          modelName: line.modelName,
-          mean: 0,
-          gain: 0,
-          nMean: 0,
-          nGain: 0,
-          nDays: 0,
+        data = findModelName(models, line);
+        if (data == null) {
+          data = {
+            modelName: line.modelName,
+            mean: 0,
+            gain: 0,
+            nMean: 0,
+            nGain: 0,
+            nDays: 0,
+          }
+          models.push(data);
         }
-        models.push(data);
       }
       if (line.marketMean > 0) {
         data.mean += line.count * line.marketMean;
