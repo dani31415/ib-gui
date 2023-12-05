@@ -11,6 +11,7 @@ import Error from '@mui/icons-material/Error';
 import CheckBox from '@mui/icons-material/CheckBox';
 import CircularProgress from '@mui/material/CircularProgress';
 import WarningIcon from '@mui/icons-material/Warning';
+import Block from '@mui/icons-material/Block';
 import { green, red, grey } from '@mui/material/colors';
 import JobsSuccessDate from './JobSuccessDate';
 
@@ -66,6 +67,7 @@ export default function Jobs() {
                 { item.color === 'red' ? <Error sx={{ color: red[500] }} /> : '' }
                 { item.color === 'blue' ? <CheckBox sx={{ color: green[500] }} /> : '' }
                 { item.color === 'disabled' ? <WarningIcon sx={{ color: grey[500] }} /> : '' }
+                { item.color === 'aborted' ? <Block sx={{ color: grey[500] }} /> : '' }
                 { item.color.indexOf('_anime') >= 0 ?  <CircularProgress size='20px'/> : '' }
             </TableCell>
             <TableCell><JobsSuccessDate name={ item.name } /></TableCell>

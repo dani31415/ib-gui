@@ -28,7 +28,13 @@ export async function job(name: string) {
     });
     if (result.status === 200) {
       const json = await result.json();
-      let url = json.lastSuccessfulBuild.url;
+      console.log(json)
+      let url = null;
+      if (json.lastCompletedBuild) {
+        url = json.lastCompletedBuild.url;
+      } else {
+        url = json.lastSuccessfulBuild.url;
+      }
       url = url.replace('broker','192.168.0.150')
       const resultLastSuccessfulBuild = await fetch(url + '/api/json', {
         headers: {

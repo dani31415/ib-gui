@@ -20,7 +20,7 @@ export default async function jenkinsStatus() {
     const json = await result.json();
     numberOfJobs = json.jobs.length;
     for (const job of json.jobs) {
-      if (job.color !== 'blue' && job.color !== 'blue_anime') {
+      if (job.color !== 'blue' && job.color !== 'blue_anime' && job.color !== 'aborted') {
         success = false;
         message = 'A job failed';
       }
