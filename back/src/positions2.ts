@@ -41,18 +41,20 @@ export async function positions2() {
   const result = []
   const internalOrders = openOrders.concat(closingOrders, openingOrders);
   for (const position of positions) {
-    let resultPosition: ResultPosition = {
-      conid: position['conid'],
-      shortName: position['ticker'] ?? position['contractDesc'],
-      quantity: position['position'],
-      hasIbPosition: true,
-      mktValue: position['mktValue'],
-      pnl: dec(position['realizedPnl'] + position['unrealizedPnl']),
-      incrementRules: position['incrementRules'],
-      internal: [],
-      hasSellDesiredPrice: false,
-    };
-    result.push(resultPosition);
+    if (position['position'] > 0) {
+      let resultPosition: ResultPosition = {
+        conid: position['conid'],
+        shortName: position['ticker'] ?? position['contractDesc'],
+        quantity: position['position'],
+        hasIbPosition: true,
+        mktValue: position['mktValue'],
+        pnl: dec(position['realizedPnl'] + position['unrealizedPnl']),
+        incrementRules: position['incrementRules'],
+        internal: [],
+        hasSellDesiredPrice: false,
+      };
+      result.push(resultPosition);
+    }
   }
 
   for (let order of internalOrders) {
