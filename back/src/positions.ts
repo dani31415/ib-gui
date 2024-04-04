@@ -43,7 +43,7 @@ export async function closePosition(conid: number) {
 
   const orderInfo = (await snapshot([conid]))[0];
 
-  if (position.position! < 1) {
+  if (Math.round(position.position!) != position.position!) {
     price = orderInfo?.bidPrice;
     orderType = 'LMT';
   } else {
