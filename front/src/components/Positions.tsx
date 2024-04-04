@@ -52,7 +52,7 @@ export default function Positions() {
 
   function computeStatus(position: any) {
     let error = false;
-    let pending = false;
+    let pending = '';
     if (position.internal.length>0) {
       let quantity = 0;
       for (let order of position.internal) {
@@ -62,15 +62,20 @@ export default function Positions() {
         }
         if (order.status !== 'open') {
           if (order.status === 'closing' && !order.hasSellDesiredPrice) {
-            pending = false;
+            pending = '';
           } else {
-            pending = true;
+            if (order.status=='opening') {
+              pending = 'purchasing';
+            } else {
+              pending = 'selling';
+            }
+            
           }
         }
         quantity += order.quantity;
       }
       if (position.quantity !== quantity) {
-        pending = true;
+        pending = 'warning';
       }
     } else {
       error = true;
@@ -78,8 +83,8 @@ export default function Positions() {
 
     if (error) {
       return 'error';
-    } else if (pending) {
-      return 'warning';
+    } else if (pending.length>0) {
+      return pending;
     }
     return 'ok';
   }
