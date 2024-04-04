@@ -145,7 +145,6 @@ export default function Report() {
             <TableCell>Market</TableCell>
             <TableCell>Sold</TableCell>
             <TableCell>Fail*</TableCell>
-            <TableCell>Bad**</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -156,10 +155,9 @@ export default function Report() {
             <TableCell>{ dec(item['marketMean']) }</TableCell>
             { item['count'] == item['total'] - item['discarded'] - item['opening'] ? 
                 <TableCell>{ item['count'] }</TableCell> : 
-                <TableCell>{ item['count'] }/{ item['total'] - item['discarded'] - item['opening'] }</TableCell>
+                <TableCell>{ item['count'] } / { item['total'] - item['discarded'] - item['opening'] }</TableCell>
             }
-            <TableCell>{ item['failed'] }</TableCell>
-            <TableCell>{ item['discarded'] }</TableCell>
+            <TableCell>{ item['failed'] } + { item['discarded'] }</TableCell>
           </TableRow>
         ))}
         </TableBody>
@@ -167,9 +165,7 @@ export default function Report() {
       <span>{ text }</span>
     </Table>
     <div style={ {fontSize: '70%'} }>
-    Fail* - Failed due to market reasons. No seller found.
-    <br />
-    Bad** - Discarded because company does not meet requirements.
+    Fail* - No requirements + No purchase
     </div>
   </div>);
 }
