@@ -1,4 +1,5 @@
 #!/bin/bash
 set -e
-cp /mnt/c/Users/dani3/.ssh/id_rsa ./back/id_rsa
-DOCKER_HOST="ssh://administrator@casa" docker-compose up --build -d
+cp ~/.ssh/id_rsa2 ./back/id_rsa
+cp ~/.ssh/id_rsa2.pub ./back/id_rsa.pub
+DOCKER_HOST="ssh://administrator@192.168.0.178" docker-compose up --build -d
