@@ -154,7 +154,10 @@ export default function Report() {
             <TableCell>{ item['date'] }</TableCell>
             <TableCell>{ dec(item['gain']) }</TableCell>
             <TableCell>{ dec(item['marketMean']) }</TableCell>
-            <TableCell>{ item['count'] }</TableCell>
+            { item['count'] == item['total'] - item['discarded'] - item['opening'] ? 
+                <TableCell>{ item['count'] }</TableCell> : 
+                <TableCell>{ item['count'] }/{ item['total'] - item['discarded'] - item['opening'] }</TableCell>
+            }
             <TableCell>{ item['failed'] }</TableCell>
             <TableCell>{ item['discarded'] }</TableCell>
           </TableRow>

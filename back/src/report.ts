@@ -53,6 +53,7 @@ export async function report(taxes: boolean, comsissions: boolean) {
     let marketMean = 0;
     let failed = 0;
     let discarded = 0;
+    let opening = 0;
     let modelName = null;
     let date = null;
     for (const order of result[key]) {
@@ -80,8 +81,11 @@ export async function report(taxes: boolean, comsissions: boolean) {
       if (order.status === 'discarded') {
         discarded += 1;
       }
+      if (order.status === 'opening') {
+        opening += 1;
+      }
     }
-    result2.push({date, gain: price/count, marketMean: marketMean/count, count, failed, discarded, total, modelName});
+    result2.push({date, gain: price/count, marketMean: marketMean/count, count, failed, discarded, total, opening, modelName});
   }
 
   result2.sort( (a:any, b:any) => a.date < b.date ? 1 : -1);

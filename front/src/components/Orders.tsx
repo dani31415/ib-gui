@@ -7,10 +7,13 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+import Divider from '@mui/material/Divider';
 
 export default function Positions() {
   const [toggle, setToggle] = useState(true);
-  const [orders, setOrders] = useState([]);
+  const [submittedOrders, setSubmittedOrders] = useState<any[]>([]);
+  const [filledOrders, setFilledOrders] = useState<any[]>([]);
+  const [cancelledOrders, setCancelledOrders] = useState<any[]>([]);
   const [text, setText] = useState('');
   const navigate = useNavigate();
 
@@ -44,6 +47,24 @@ export default function Positions() {
     navigate(`/orders/${id}`);
   }
 
+  function setOrders(orders: any[]) {
+    const filledOrders: any[] = [];
+    const submittedOrders: any[] = [];
+    const cancelleddOrders: any[] = [];
+    for (const order of orders) {
+      if (order.status == 'Submitted' || order.status == 'PreSubmitted') {
+        submittedOrders.push(order);
+      } else if (order.status == 'Filled') {
+        filledOrders.push(order)
+      } else {
+        cancelledOrders.push(order)
+      }
+    }
+    setFilledOrders(filledOrders);
+    setSubmittedOrders(submittedOrders);
+    setCancelledOrders(cancelledOrders);
+  }
+
   return (
     <span>
       <TableContainer component={Paper}>
@@ -57,8 +78,40 @@ export default function Positions() {
           </TableRow>
         </TableHead>
         <TableBody>
-        { orders.map( order => (
+          <TableRow>
+            <TableCell colSpan={5}>Pending</TableCell>
+          </TableRow>
+        { submittedOrders.map( order => (
           <TableRow hover onClick={() => openRow(order['orderId'])}>
+            <TableCell>{ order['side'] }</TableCell>
+            <TableCell>{ order['ticker'] }</TableCell>
+            <TableCell>{ order['filledQuantity'] }</TableCell>
+            <TableCell>{ order['remainingQuantity'] }</TableCell>
+            <TableCell>{ order['status'] }</TableCell>
+          </TableRow>
+        ))}
+        </TableBody>
+        <Divider orientation="vertical" flexItem />
+        <TableBody>
+          <TableRow>
+            <TableCell colSpan={5}>Filled</TableCell>
+          </TableRow>
+        { filledOrders.map( order => (
+          <TableRow hover onClick={() => openRow(order['orderId'])}>
+            <TableCell>{ order['side'] }</TableCell>
+            <TableCell>{ order['ticker'] }</TableCell>
+            <TableCell>{ order['filledQuantity'] }</TableCell>
+            <TableCell>{ order['remainingQuantity'] }</TableCell>
+            <TableCell>{ order['status'] }</TableCell>
+          </TableRow>
+        ))}
+        </TableBody>
+        <TableBody>
+          <TableRow>
+            <TableCell colSpan={5}>Cancelled</TableCell>
+          </TableRow>
+        { cancelledOrders.map( order => (
+        <TableRow hover onClick={() => openRow(order['orderId'])}>
             <TableCell>{ order['side'] }</TableCell>
             <TableCell>{ order['ticker'] }</TableCell>
             <TableCell>{ order['filledQuantity'] }</TableCell>
