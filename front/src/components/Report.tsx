@@ -134,7 +134,23 @@ export default function Report() {
     action().catch(console.error);
   }, [modelSummary]);
 
-  return (<div>
+  function prefix(x: string) {
+    const i = x.indexOf('_')
+    if (i>0) {
+      return x.substring(0,i)
+    }
+    return x;
+  }
+
+  function postfix(x: string) {
+    const i = x.indexOf('_')
+    if (i>0) {
+      return x.substring(i+1)
+    }
+    return x;
+  }
+
+return (<div>
     <FormGroup>
       <Box>
         <FormControlLabel control={<Checkbox checked={commissions && taxes} onChange={handleCommissionsAndTaxes}/>} label="Comissions & taxes" />
@@ -154,7 +170,7 @@ export default function Report() {
         <TableBody>
         { modelSummary.map( item => (
           <TableRow>
-            <TableCell style={ {fontSize:'70%'} }>{ item.modelName }<br></br>{ item.date }</TableCell>
+            <TableCell style={ {fontSize:'70%'} }>{prefix(item.modelName)}<br></br>{postfix(item.modelName)}<br></br>{ item.date }</TableCell>
             <TableCell>{ dec(item.gain) }</TableCell>
             <TableCell>{ dec(item.mean) }</TableCell>
             <TableCell>{ item.simGains == 0 ? '-':<span>{dec(item.simGains)}</span>}</TableCell>
