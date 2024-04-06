@@ -92,3 +92,47 @@ export async function report(taxes: boolean, comsissions: boolean) {
 
   return result2;
 }
+
+export async function simulation(modelName: string) {
+  const ordersRequest = await fetch(`http://192.168.0.150:8000/orders?modelName=${modelName}`);
+  const simitemsRequest = await fetch(`http://192.168.0.150:8000/simulationitems?modelName=${modelName}`);
+  const orders = await ordersRequest.json();
+  const simitems = await simitemsRequest.json();
+  const result: any[] = [];
+  let orderCount = 0;
+  let simCount = 0;
+  let bothCount = 0;
+  let simGains = 0;
+  let orderGains = 0;
+  for (const order of orders) {
+    for (const simitem of simitems) {
+      if (order.date === simitem.date && order.order==simitem.order && order.minute == simitem.minute) {
+        if (order.buyOrderPrice && order.sellOrderPrice) {
+          orderCount += 1;
+          orderGains += order.sellOrderPrice / order.buyOrderPrice;
+        }
+        if (simitem.gains) {
+          simCount += 1;
+          simGains += simitem.gains;
+        }
+        if (order.buyOrderPrice && order.sellOrderPrice && simitem.gains) {
+          bothCount += 1;
+          result.push({
+            date: order.date,
+            minute: order.minute,
+            symbol: order.symbolSrcName,
+            orderGains: order.sellOrderPrice / order.buyOrderPrice,
+            simGains: simitem.gains,
+          })
+        }
+      }
+    }
+  }
+  let g = 0;
+  let c = 0;
+  for (const r of result) {
+    g += r.orderGains / r.simGains;
+    c += 1;
+  }
+  return {'ratio': g/c, 'match': bothCount/simCount, simGains: simGains/simCount, orderGains: orderGains/orderCount};
+}

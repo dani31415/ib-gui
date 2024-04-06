@@ -11,7 +11,7 @@ import { snapshot } from './src/snapshot';
 import { order, orders } from './src/orders';
 import { simulationData } from './src/simulation-data';
 import { simulationDataN } from './src/simulation-data-n';
-import { report } from './src/report';
+import { report, simulation } from './src/report';
 import { train, trainProcess, trainRun, trainSummary } from './src/train';
 import { jobs, job } from './src/jobs';
 
@@ -222,6 +222,20 @@ app.get('/api/simulation2', async (req, res) => {
     const actualSell = req.query.actualSell === 'true'
     const simulation = await simulationDataN(optimize1, optimize2, useEarlyStop, actualSell);
     res.send({success: true, simulation});
+  } catch (ex: any) {
+    res.status(400).send({ error: ex.message ?? 'Error.' });
+  }
+});
+
+app.get('/api/simulation3', async (req, res) => {
+  try {
+    console.log('Connection done!');
+    if (req.query.modelName) {
+      const simulationResult = await simulation(req.query.modelName as string);
+      res.send({success: true, simulation: simulationResult});
+    } else {
+      res.send({error: 'Missing modelName.'});
+    }
   } catch (ex: any) {
     res.status(400).send({ error: ex.message ?? 'Error.' });
   }

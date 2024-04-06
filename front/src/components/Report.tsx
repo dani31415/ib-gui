@@ -54,6 +54,7 @@ export default function Report() {
             nMean: 0,
             nGain: 0,
             nDays: 0,
+            sim: 0,
           }
           models.push(data);
         }
@@ -106,6 +107,30 @@ export default function Report() {
     action().catch(console.error);
   }, [ toggle, commissions, taxes ]);
 
+  useEffect( () => {
+    async function action() {
+      let changed = false;
+      let models = [];
+      for (const model of modelSummary) {
+        models.push(model);
+        if (model.sim == 0) {
+          const modelName = model.modelName;
+          const response = await fetch(`/api/simulation3?modelName=${modelName}`);
+          const result = await response.json()
+          console.log(result);
+          model.sim = result.simulation.simGains;
+          if (model.sim != 0) {
+            changed = true;
+          }
+        }
+      }
+      if (changed) {
+        setModelSummary(models);
+      }
+    }
+    action().catch(console.error);
+  }, [modelSummary]);
+
   return (<div>
     <FormGroup>
       <Box>
@@ -119,16 +144,16 @@ export default function Report() {
             <TableCell>Model</TableCell>
             <TableCell>Gain</TableCell>
             <TableCell>Market</TableCell>
-            <TableCell>From</TableCell>
+            <TableCell>Sim</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
         { modelSummary.map( item => (
           <TableRow>
-            <TableCell style={ {fontSize:'70%'} }>{ item.modelName }</TableCell>
+            <TableCell style={ {fontSize:'70%'} }>{ item.modelName } { item.date }</TableCell>
             <TableCell>{ dec(item.gain) }</TableCell>
             <TableCell>{ dec(item.mean) }</TableCell>
-            <TableCell>{ item.date }</TableCell>
+            <TableCell>{ item.sim == 0 ? '-':dec(item.sim) }</TableCell>
           </TableRow>
         ))}
         </TableBody>
