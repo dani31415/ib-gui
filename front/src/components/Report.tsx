@@ -119,6 +119,7 @@ export default function Report() {
           const result = await response.json()
           console.log(result);
           model.sim = result.simulation.simGains;
+          model.match = Math.round(100*result.simulation.match);
           if (model.sim != 0) {
             changed = true;
           }
@@ -150,10 +151,10 @@ export default function Report() {
         <TableBody>
         { modelSummary.map( item => (
           <TableRow>
-            <TableCell style={ {fontSize:'70%'} }>{ item.modelName } { item.date }</TableCell>
+            <TableCell style={ {fontSize:'70%'} }>{ item.modelName }<br></br>{ item.date }</TableCell>
             <TableCell>{ dec(item.gain) }</TableCell>
             <TableCell>{ dec(item.mean) }</TableCell>
-            <TableCell>{ item.sim == 0 ? '-':dec(item.sim) }</TableCell>
+            <TableCell>{ item.sim == 0 ? '-':<span>{dec(item.sim)} ({dec(item.match)}%)</span>}</TableCell>
           </TableRow>
         ))}
         </TableBody>
