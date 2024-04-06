@@ -55,6 +55,7 @@ export default function Report() {
             nGain: 0,
             nDays: 0,
             sim: 0,
+            simGains: 0,
           }
           models.push(data);
         }
@@ -118,8 +119,9 @@ export default function Report() {
           const response = await fetch(`/api/simulation3?modelName=${modelName}`);
           const result = await response.json()
           console.log(result);
-          model.sim = result.simulation.simGains;
+          model.sim = Math.round(1000*result.simulation.ratio)/10;
           model.match = Math.round(100*result.simulation.match);
+          model.simGains = result.simulation.simGains;
           if (model.sim != 0) {
             changed = true;
           }
@@ -146,6 +148,7 @@ export default function Report() {
             <TableCell>Gain</TableCell>
             <TableCell>Market</TableCell>
             <TableCell>Sim</TableCell>
+            <TableCell>%sim</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -154,7 +157,8 @@ export default function Report() {
             <TableCell style={ {fontSize:'70%'} }>{ item.modelName }<br></br>{ item.date }</TableCell>
             <TableCell>{ dec(item.gain) }</TableCell>
             <TableCell>{ dec(item.mean) }</TableCell>
-            <TableCell>{ item.sim == 0 ? '-':<span>{dec(item.sim)} ({dec(item.match)}%)</span>}</TableCell>
+            <TableCell>{ item.simGains == 0 ? '-':<span>{dec(item.simGains)}</span>}</TableCell>
+            <TableCell>{ item.sim == 0 ? '-':<span>{dec(item.sim)}</span>}</TableCell>
           </TableRow>
         ))}
         </TableBody>
