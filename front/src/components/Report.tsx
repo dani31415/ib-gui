@@ -150,6 +150,19 @@ export default function Report() {
     return x;
   }
 
+  function color(x: any) {
+    if (x['modelName'] == modelSummary[0]['modelName']) {
+      return '#E8F8F5';
+    }
+    if (x['modelName'] == modelSummary[1]['modelName']) {
+      return '#FEF9E7';
+    }
+    if (x['modelName'] == modelSummary[2]['modelName']) {
+      return '#FDEDEC';
+    }
+    return 'white';
+  }
+
 return (<div>
     <FormGroup>
       <Box>
@@ -169,7 +182,7 @@ return (<div>
         </TableHead>
         <TableBody>
         { modelSummary.map( item => (
-          <TableRow>
+          <TableRow style={ {background: color(item) }}>
             <TableCell style={ {fontSize:'70%'} }>{prefix(item.modelName)}<br></br>{postfix(item.modelName)}<br></br>{ item.date }</TableCell>
             <TableCell>{ dec(item.gain) }</TableCell>
             <TableCell>{ dec(item.mean) }</TableCell>
@@ -195,7 +208,7 @@ return (<div>
         </TableHead>
         <TableBody>
         { report.map( item => (
-          <TableRow>
+          <TableRow style={ {background: color(item)} }>
             <TableCell>{ item['date'] }</TableCell>
             <TableCell>{ dec(item['gain']) }</TableCell>
             <TableCell>{ dec(item['marketMean']) }</TableCell>
