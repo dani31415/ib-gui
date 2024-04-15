@@ -4,7 +4,7 @@ import Box from '@mui/material/Box';
 import CardContent from '@mui/material/CardContent';
 
 import JenkinsStatus from './JenkinsStatus'
-import PositionsSummary from './PositionsSummary'
+import OrderSummary from './OrderSummary'
 import { Container } from '@mui/system';
 
 export default function NavBar() {
@@ -17,7 +17,7 @@ export default function NavBar() {
       <Card>
         <CardContent style={{textAlign: 'center', fontSize: '120%'}}>
           <JenkinsStatus />
-          <PositionsSummary />
+          <OrderSummary />
         </CardContent>
       </Card>
     </Box>

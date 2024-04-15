@@ -8,6 +8,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import PositionStatus from './PositionStatus';
+import PositionsSummary from './PositionsSummary'
 
 export default function Positions() {
   const [toggle, setToggle] = useState(true);
@@ -96,30 +97,33 @@ export default function Positions() {
   }
 
   return (
-    <Table>
-      <TableContainer component={Paper}>
-        <TableHead>
-          <TableRow>
-            <TableCell>Symbol</TableCell>
-            <TableCell>Value</TableCell>
-            <TableCell>&Delta;</TableCell>
-            <TableCell>Date</TableCell>
-            <TableCell></TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-        { positions.filter( p => p['quantity']>0 ).map( position => (
-          <TableRow hover onClick={() => openRow(position['conid'])}>
-            <TableCell>{ position['shortName'] }</TableCell>
-            <TableCell>{ position['mktValue'] }</TableCell>
-            <TableCell style={{color: position['pnl']>0 ? '#12ad2b' : '#c11b17'}}>{ position['pnl'] }</TableCell>
-            <TableCell>{ formatDate(position['firstCreatedAt']) }</TableCell>
-            <TableCell><PositionStatus status={ position['computedStatus'] }/></TableCell>
-          </TableRow>
-        ))}
-        </TableBody>
-      </TableContainer>
-      <span>{ text }</span>
-    </Table>
+    <div>
+      <PositionsSummary />
+      <Table>
+        <TableContainer component={Paper}>
+          <TableHead>
+            <TableRow>
+              <TableCell>Symbol</TableCell>
+              <TableCell>Value</TableCell>
+              <TableCell>&Delta;</TableCell>
+              <TableCell>Date</TableCell>
+              <TableCell></TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+          { positions.filter( p => p['quantity']>0 ).map( position => (
+            <TableRow hover onClick={() => openRow(position['conid'])}>
+              <TableCell>{ position['shortName'] }</TableCell>
+              <TableCell>{ position['mktValue'] }</TableCell>
+              <TableCell style={{color: position['pnl']>0 ? '#12ad2b' : '#c11b17'}}>{ position['pnl'] }</TableCell>
+              <TableCell>{ formatDate(position['firstCreatedAt']) }</TableCell>
+              <TableCell><PositionStatus status={ position['computedStatus'] }/></TableCell>
+            </TableRow>
+          ))}
+          </TableBody>
+        </TableContainer>
+        <span>{ text }</span>
+      </Table>
+    </div>
   )
 }

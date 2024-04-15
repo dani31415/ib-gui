@@ -35,7 +35,7 @@ function PositionsSummary() {
   }, [ toggle ]);
 
   return (
-    <div className="PositionsSummary">{ text }</div>
+    <div className="PositionsSummary">Positions: { text }</div>
   );
 }
 
