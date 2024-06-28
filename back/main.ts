@@ -19,55 +19,107 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 require('dotenv').config();
 
-const apiProxy = httpProxy.createProxyServer();
+const apiProxy = httpProxy.createProxyServer({
+  target: 'https://192.168.0.178:8000',
+  secure: false,
+  cookieDomainRewrite: 'danjau.synology.me',
+  cookiePathRewrite: '/',
+  // hostRewrite: 'localhost:8000',
+  // autoRewrite: false,
+  // changeOrigin: false,
+  // xfwd: false,
+});
+
+// apiProxy.on('proxyRes', function (proxyRes, req, res) {
+//   const cookies = proxyRes.headers['set-cookie'];
+//   if (cookies) {
+//     for (let i=0;i< cookies!.length; i+=1) {
+//       cookies[i] = cookies[i].replace('; secure','');
+//       cookies[i] = cookies[i].replace(';Secure','');
+//       console.log(i, cookies[i]);
+      
+//     }
+//   }
+//   // var body: Uint8Array [] = [];
+//   // proxyRes.on('data', function (chunk) {
+//   //   res.write(chunk);
+//   //     // body.push(chunk);
+//   // });
+//   // proxyRes.on('end', function () {
+//   //     // var str = Buffer.concat(body).toString();
+//   //     // console.log("res from proxied server:", str);
+//   //     res.end();
+//   // });
+//   // console.log('Cookies', JSON.stringify(proxyRes.headers['set-cookie'], null, 2));
+// });
+
+const gitProxy = httpProxy.createProxyServer({
+  target: 'http://192.168.0.150:8080',
+  secure: false,
+});
 const app = express();
 
-app.get('/sso/Dispatcher*', function(req, res){
-  console.log('GET dispatch');
-  apiProxy.web(req, res, {target: 'https://192.168.0.178:8000', secure:false});
-  res.redirect('/'); // Redirected to home
-});
+// app.get('/sso/Dispatcher*', function(req, res){
+//   // console.log('GET dispatch');
+//   console.log('GET', req.url);
+//   apiProxy.web(req, res);
+//   // res.redirect('/'); // Redirected to home
+// });
 
-app.post('/sso/Dispatcher*', function(req, res){
-  console.log('POST dispatch');
-  console.log(req.hostname);
-  console.log(req.url);
-  console.log(req.headers);
-  apiProxy.web(req, res, {target: 'https://192.168.0.178:8000', secure:false});
-  // res.redirect('/'); // Redirected to home
-});
+// app.post('/sso/Dispatcher*', function(req, res){
+//   // console.log('POST dispatch');
+//   // console.log(req.hostname);
+//   console.log('POST', req.url);
+//   // console.log(req.headers);
+//   apiProxy.web(req, res);
+//   // res.redirect('/'); // Redirected to home
+//   // res.setHeader('Location',
+//   //  'https://www.interactivebrokers.com/Universal/servlet/AccountAccess.AuthenticateSSO?ip2loc=US&loginType=0&forwardTo=22&clt=0&RL=1');
+// });
 
 app.all("/github-webhook/*", function(req, res) {
-  apiProxy.web(req, res, {target: 'http://192.168.0.150:8080', secure:false});
+  gitProxy.web(req, res);
 });
 
 app.all("/sso/*", function(req, res) {
-  console.log(req.hostname);
-  apiProxy.web(req, res, {target: 'https://192.168.0.178:8000', secure:false});
+  // req.headers['host'] = 'localhost:30303';
+  // req.headers['origin'] = 'http://localhost:30303';
+  // if ('referer' in req.headers) {
+  //   const url0 = new URL(req.headers['referer']!)
+  //   const url1 = new URL(url0.pathname + url0.search, 'http://localhost:30303')
+  //   req.headers['referer'] = url1.toString();
+  // }
+  // req.hostname = 'localhost';
+  console.log(req.method, req.url);
+  // if (req.url.indexOf('Login') > 0 || req.url.indexOf('Dispatcher') > 0 || req.url.indexOf('Authenticator') > 0) {
+  //   console.log(req.headers);
+  // }
+
+  apiProxy.web(req, res);
 });
 
 app.all("/css/*", function(req, res) {
-  apiProxy.web(req, res, {target: 'https://192.168.0.178:8000', secure:false});
+  apiProxy.web(req, res);
 });
 
 app.all("/fonts/*", function(req, res) {
-  apiProxy.web(req, res, {target: 'https://192.168.0.178:8000', secure:false});
+  apiProxy.web(req, res);
 });
 
 app.all("/en/*", function(req, res) {
-  apiProxy.web(req, res, {target: 'https://192.168.0.178:8000', secure:false});
+  apiProxy.web(req, res);
 });
 
 app.all("/scripts/*", function(req, res) {
-  apiProxy.web(req, res, {target: 'https://192.168.0.178:8000', secure:false});
+  apiProxy.web(req, res);
 });
 
 app.all("/images/*", function(req, res) {
-  apiProxy.web(req, res, {target: 'https://192.168.0.178:8000', secure:false});
+  apiProxy.web(req, res);
 });
 
 app.all("/portal.proxy/*", function(req, res) {
-  apiProxy.web(req, res, {target: 'https://192.168.0.178:8000', secure:false});
+  apiProxy.web(req, res);
 });
 
 app.get('/api/internal/orders/:conid', async (req, res) => {

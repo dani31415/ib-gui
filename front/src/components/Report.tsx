@@ -76,7 +76,7 @@ export default function Report() {
         data.mean = data.mean / data.nMean;
     }
     // setModelSummary([models[0]]);
-    setModelSummary([models[0], models[1], models[2]]);
+    setModelSummary([models[0], models[1], models[2], models[3]]);
   }
 
   useEffect( () => {
@@ -159,6 +159,9 @@ export default function Report() {
     }
     if (x['modelName'] == modelSummary[2]['modelName']) {
       return '#FDEDEC';
+    }
+    if (x['modelName'] == modelSummary[3]['modelName']) {
+      return '#EAFAF1';
     }
     return 'white';
   }
