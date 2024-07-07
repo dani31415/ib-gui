@@ -91,6 +91,14 @@ export default function Train() {
     }
   }
 
+  function gpu(t: any) {
+    if (t['running'] && 'pid' in t) {
+      return 'pid=' + t['pid'];
+    } else {
+      return '';
+    }
+  }
+
   function showSummaryDialog(summaryLine: any) {
     setSummaryLine(summaryLine);
     setOpenSummaryDialog(true);
@@ -162,7 +170,7 @@ return (<div>
           <TableRow>
             <TableCell sx={style(t)}>{ t['name'] }<br></br>{t['end_period']} {t['variant']}-{t['iteration']}</TableCell>
             <TableCell  sx={style(t)}>{ t['modified'] ?? ''}</TableCell>
-            <TableCell  sx={style(t)}>{ status(t) }<br></br>{ info(t) } </TableCell>
+            <TableCell  sx={style(t)}>{ status(t) }<br></br>{ info(t) }<br></br>{ gpu(t) } </TableCell>
           </TableRow>
         ))}
         </TableBody>
