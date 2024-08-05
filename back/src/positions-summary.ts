@@ -40,15 +40,23 @@ export default async function positionsSummary() {
   try {
     const data = await ibAPI.snapshot(conids);
     let gains = 0;
+    let detail : any[] = [];
     let quantity = 0;
     for (const idx in data) {
       if (isFinite(data[idx].lastPrice!) && orders[idx].buyOrderPrice) { // might be nan
-        gains += data[idx].lastPrice! / orders[idx].buyOrderPrice;
-        quantity += 1;
+        const q = orders[idx].boughtQuantity! - orders[idx].soldQuantity!;
+        gains += q * orders[idx].buyOrderPrice * data[idx].lastPrice! / orders[idx].buyOrderPrice;
+        detail.push({
+          ticker: orders[idx].symbolSrcName,
+          buy: orders[idx].buyOrderPrice*q,
+          pnl: (data[idx].lastPrice!-orders[idx].buyOrderPrice)*q,
+          gains: data[idx].lastPrice! / orders[idx].buyOrderPrice,
+        })
+        quantity += q * orders[idx].buyOrderPrice;
       }
     }
     gains /= quantity;
-    return { success: true, gains };
+    return { success: true, gains, detail };
   } catch (err: any) {
     if (err.message && err.message === 'Unauthorized') {
       err.success = false; 
