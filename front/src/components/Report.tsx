@@ -215,11 +215,11 @@ return (<div>
             <TableCell>{ item['date'] }</TableCell>
             <TableCell>{ dec(item['gain']) }</TableCell>
             <TableCell>{ dec(item['marketMean']) }</TableCell>
-            { item['count'] == item['total'] - item['discarded'] - item['opening'] ? 
+            { item['count'] == item['total'] - item['discarded'] - item['opening'] - item['duplicated'] ? 
                 <TableCell>{ item['count'] }</TableCell> : 
-                <TableCell>{ item['count'] } / { item['total'] - item['discarded'] - item['opening'] }</TableCell>
+                <TableCell>{ item['count'] } / { item['total'] - item['discarded'] - item['opening'] - item['duplicated'] }</TableCell>
             }
-            <TableCell>{ item['failed'] } + { item['discarded'] }</TableCell>
+            <TableCell>{ item['failed'] }+{ item['discarded'] + item['duplicated'] }</TableCell>
           </TableRow>
         ))}
         </TableBody>

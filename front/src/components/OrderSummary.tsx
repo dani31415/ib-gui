@@ -22,6 +22,7 @@ export function OrderSummary() {
         let sold = 0;
         let cancelled = 0;
         for (const order of orders) {
+          console.log(order)
           if (order.status == 'Submitted' || order.status == 'PreSubmitted') {
             if (order.side == 'BUY') {
                 purchasing  += 1;
@@ -29,7 +30,7 @@ export function OrderSummary() {
             if (order.side == 'SELL') {
                 selling  += 1;
             }
-          } else if (order.status == 'Filled') {
+          } else if (order.status == 'Filled' || order.status == 'Cancelled' && order.filledQuantity > 0) {
             if (order.side == 'BUY') {
                 purchased  += 1;
             }
