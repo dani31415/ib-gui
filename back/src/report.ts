@@ -39,7 +39,6 @@ async function reportWithConnection(conn: PoolConnection, taxes: boolean, comsis
   const periodsRequest = await fetch('http://192.168.0.150:8000/periods');
   const periods = await periodsRequest.json();
 
-  console.log('begin');
   const [orders, ] : [any, any] = await conn.query<mysql.QueryResult>(`
     SELECT 
       count(*) as count,
@@ -51,9 +50,6 @@ async function reportWithConnection(conn: PoolConnection, taxes: boolean, comsis
     FROM broker.order group by status,date, model_name
     ORDER BY date desc `
   );
-  console.log('end');
-  console.log(orders.length);
-  console.log(orders[0])
 
   const marketMeans: any = {};
   for (const period of periods) {
@@ -64,7 +60,6 @@ async function reportWithConnection(conn: PoolConnection, taxes: boolean, comsis
 
   for (const order of orders) {
     const key = order.date.toISOString() + ' ' + order.model_name;
-    console.log(key)
     if (!result.hasOwnProperty(key)) {
       result[key] = [];
     }
@@ -87,9 +82,10 @@ async function reportWithConnection(conn: PoolConnection, taxes: boolean, comsis
       date = DateTime.fromJSDate(order.date).toISODate();
       modelName = order.model_name;
       if (order.gains1) {
-        price += order.gains1;
+        price += order.count*order.gains1;
         count += order.count;
-        // marketMean += computeMarketMean(order.date, order.date, marketMeans);
+        const strDate = order.date.toISOString();
+        marketMean += order.count*computeMarketMean(strDate, strDate, marketMeans);
       }
       if (order.status !== 'failed' || order.description && order.description.indexOf('Cancelled')>=0) {
         total += order.count;
