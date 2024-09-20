@@ -19,7 +19,8 @@ export async function dayWithConnection(conn: PoolConnection, date: string) {
             count(*) as count,
             avg(sell_order_price/buy_order_price) as gains1,
             avg(gains2) as gains2,
-            avg(buy_order_price) as buy_order_price
+            avg(buy_order_price) as buy_order_price,
+            avg(bought_quantity) as bought_quantity
         FROM broker.order 
             left join broker.simulations 
             on broker.order.date = simulations.date and broker.order.minute=simulations.minute and broker.order.order=simulations.order and broker.order.model_name=simulations.model_name

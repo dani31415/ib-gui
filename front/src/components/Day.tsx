@@ -47,8 +47,9 @@ export default function Day() {
         <TableHead>
           <TableRow>
             <TableCell>Name</TableCell>
-            <TableCell>Count</TableCell>
+            <TableCell>#</TableCell>
             <TableCell>Price</TableCell>
+            <TableCell>#</TableCell>
             <TableCell>Gains1</TableCell>
             <TableCell>Gains2</TableCell>
           </TableRow>
@@ -59,6 +60,7 @@ export default function Day() {
             <TableCell>{ order['name'] }</TableCell>
             <TableCell>{ order['count'] }</TableCell>
             <TableCell>{ round2(order['buy_order_price']) }</TableCell>
+            <TableCell>{ order['bought_quantity'] }</TableCell>
             <TableCell>{ round2(order['gains1']) }</TableCell>
             <TableCell>{ round2(order['gains2']) }</TableCell>
           </TableRow>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Area, Scatter, CartesianGrid, XAxis, YAxis, ZAxis, ComposedChart, AreaChart } from 'recharts';
+import { Area, Scatter, CartesianGrid, XAxis, YAxis, ZAxis, ComposedChart, Tooltip } from 'recharts';
 
 function round2(x: number): number {
     return Math.round(x*100)/100;
@@ -70,24 +70,26 @@ export default function Symbol() {
             for (const order of json.symbol.orders) {
                 let p: any = {
                     x: round2(order.minute),
-                    y: round2(order.price),
                     z: order.remaining != order.quantity ? 100:0,
                 }
                 if (order.side == 'S') {
+                    p.sell = round2(order.price)
                     dataS.push(p);
                 } else {
+                    p.buy = round2(order.price)
                     dataB.push(p);
                 }
 
                 if (order.status=='closed') {
                     p = {
                         x: NaN,
-                        y: NaN,
                         z: NaN,
                     }
                     if (order.side == 'S') {
+                        p.sell = NaN;
                         dataS.push(p);
                     } else {
+                        p.buy = NaN;
                         dataB.push(p);
                     }
                 }
@@ -108,8 +110,8 @@ export default function Symbol() {
     return (
       <ComposedChart width={1200} height={300}>
         <CartesianGrid stroke="#ccc"/>
-        <Scatter dataKey="y" fill='red' line={true} isAnimationActive={false} data={dataS}/>
-        <Scatter dataKey="y" fill='blue' line={true} isAnimationActive={false} data={dataB}/>
+        <Scatter dataKey="sell" fill='red' line={true} isAnimationActive={false} data={dataS}/>
+        <Scatter dataKey="buy" fill='blue' line={true} isAnimationActive={false} data={dataB}/>
         <Scatter dataKey="y" fill='gray' line={true} isAnimationActive={false} data={market}/>
         <Scatter dataKey="y" fill='gray' line={true} isAnimationActive={false} data={marketRealtime}/>
         <Area
@@ -120,8 +122,9 @@ export default function Symbol() {
             activeDot={false}
             data={marketLH}
         />
+        <Tooltip/>
         <XAxis type='number' dataKey="x" domain={[(dataMin:number) => Math.floor(dataMin-20), (dataMax:number) => Math.ceil(dataMax+20)]}/>
-        <YAxis type='number' dataKey="y" domain={domainFunc} unit='$'/>
+        <YAxis type='number' domain={domainFunc} unit='$'/>
         <ZAxis type="number" range={[0,100]} dataKey="z" />
     </ComposedChart>
     )
