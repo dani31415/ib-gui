@@ -14,6 +14,8 @@ import { simulationDataN } from './src/simulation-data-n';
 import { report, simulation } from './src/report';
 import { train, trainProcess, trainRun, trainSummary } from './src/train';
 import { jobs, job } from './src/jobs';
+import { symbol } from './src/symbol';
+import { day } from './src/day';
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
@@ -345,6 +347,26 @@ app.get('/api/train', async (req, res) => {
 
     const trainResult = await train();
     res.send({success: true, train: trainResult});
+  } catch (ex: any) {
+    res.status(400).send({ error: ex.message ?? 'Error.' });
+  }
+});
+
+app.get('/api/symbols/:name/:date', async (req, res) => {
+  try {
+    console.log('Connection done!');
+    const result = await symbol(req.params.name, req.params.date);
+    res.send({success: true, symbol: result });
+  } catch (ex: any) {
+    res.status(400).send({ error: ex.message ?? 'Error.' });
+  }
+});
+
+app.get('/api/days/:date', async (req, res) => {
+  try {
+    console.log('Connection done!');
+    const result = await day(req.params.date);
+    res.send({success: true, day: result });
   } catch (ex: any) {
     res.status(400).send({ error: ex.message ?? 'Error.' });
   }

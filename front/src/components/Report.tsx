@@ -166,6 +166,10 @@ export default function Report() {
     return 'white';
   }
 
+  function openRow(date: string) {
+    navigate(`/days/${date}`);
+  }
+
 return (<div>
     <FormGroup>
       <Box>
@@ -211,7 +215,7 @@ return (<div>
         </TableHead>
         <TableBody>
         { report.map( item => (
-          <TableRow style={ {background: color(item)} }>
+          <TableRow style={ {background: color(item)} } hover onClick={() => openRow(item['date'])}>
             <TableCell>{ item['date'] }</TableCell>
             <TableCell>{ dec(item['gain']) }</TableCell>
             <TableCell>{ dec(item['marketMean']) }</TableCell>

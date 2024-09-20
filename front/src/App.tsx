@@ -12,6 +12,8 @@ import Simulation from "./components/Simulation";
 import Report from "./components/Report";
 import Jobs from "./components/Jobs";
 import Train from "./components/Train";
+import Symbol from "./components/Symbol";
+import Day from "./components/Day";
 
 function App() {
   return (
@@ -30,6 +32,8 @@ function App() {
               <Route path="report" element={<Report />} />
               <Route path="jobs" element={<Jobs />} />
               <Route path="train" element={<Train />} />
+              <Route path="days/:date/symbols/:symbol" element={<Symbol />} />
+              <Route path="days/:date" element={<Day />} />
             </Route>
           </Routes>
         </header>
