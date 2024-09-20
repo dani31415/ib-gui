@@ -47,8 +47,21 @@ export default function Positions() {
     action().catch(console.error);
   }, [ toggle ]);
 
-  function openRow(id: number) {
-    navigate(`/positions/${id}`);
+  function digits2(month: number): string {
+    if (month<10) {
+      return "0" + month;
+    } else {
+      return  "" + month;
+    }
+  }
+
+  function openRow(name: string, id: number) {
+    // navigate(`/positions/${id}`);
+    const date: Date = new Date();
+    const sMonth = digits2(date.getMonth()+1);
+    const sDay = digits2(date.getDate());
+    const strDate = `${date.getFullYear()}-${sMonth}-${sDay}`;
+    navigate(`/days/${strDate}/symbols/${name}`);
   }
 
   function computeStatus(position: any) {
@@ -112,7 +125,7 @@ export default function Positions() {
           </TableHead>
           <TableBody>
           { positions.filter( p => p['quantity']>0 ).map( position => (
-            <TableRow hover onClick={() => openRow(position['conid'])}>
+            <TableRow hover onClick={() => openRow(position['shortName'], position['conid'])}>
               <TableCell>{ position['shortName'] }</TableCell>
               <TableCell>{ position['mktValue'] }</TableCell>
               <TableCell style={{color: position['pnl']>0 ? '#12ad2b' : '#c11b17'}}>{ position['pnl'] }</TableCell>

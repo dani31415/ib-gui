@@ -8,8 +8,11 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Divider from '@mui/material/Divider';
 
-function round2(x: number): number {
-    return Math.round(x*1000)/1000;
+function round2(x: number|null): number|null {
+    if (x===null) {
+        return null;
+    }
+    return Math.round(x*10000)/10000;
 }
 
 export default function Day() {
@@ -45,6 +48,7 @@ export default function Day() {
           <TableRow>
             <TableCell>Name</TableCell>
             <TableCell>Count</TableCell>
+            <TableCell>Price</TableCell>
             <TableCell>Gains1</TableCell>
             <TableCell>Gains2</TableCell>
           </TableRow>
@@ -54,8 +58,9 @@ export default function Day() {
           <TableRow hover onClick={() => openRow(order['name'])}>
             <TableCell>{ order['name'] }</TableCell>
             <TableCell>{ order['count'] }</TableCell>
-            <TableCell>{ order['gains1'] }</TableCell>
-            <TableCell>{ order['gains2'] }</TableCell>
+            <TableCell>{ round2(order['buy_order_price']) }</TableCell>
+            <TableCell>{ round2(order['gains1']) }</TableCell>
+            <TableCell>{ round2(order['gains2']) }</TableCell>
           </TableRow>
         ))}
         </TableBody>

@@ -39,8 +39,10 @@ function closeOrder(orders: any[], newOrder: any, order: any, oldOrder: any, clo
             const created_at_millis = DateTime.fromISO(order.created_at.toISOString());
             const closed_at_millis = closed_at; // DateTime.fromISO(closed_at.toISOString());
             ca = DateTime.fromMillis(Math.min(closed_at_millis.toMillis(), created_at_millis.toMillis())).setZone('utc');
-        } else {
+        } else if (closed_at) {
             ca = closed_at;
+        } else {
+            ca = DateTime.now().setZone('utc');
         }
         orders.push( {
             id: oldOrder.id,
@@ -68,7 +70,7 @@ export async function symbol(name: string, date: string) {
 }
 
 export async function symbolWithConnection(conn: PoolConnection, name: string, date: string) {
-    const [result, ] : [any, any] = await conn.query<mysql.QueryResult>('SELECT * FROM symbol WHERE short_name=?', name);
+    const [result, ] : [any, any] = await conn.query<mysql.QueryResult>('SELECT * FROM symbol WHERE short_name=? AND not disabled ORDER BY id DESC', name);
     const symbol_id = result[0].id;
 
     // const today = DateTime.now().toISODate();

@@ -3,6 +3,8 @@
 import fetch from 'node-fetch';
 import { IbAPI } from './ib-api';
 import { DateTime } from 'luxon';
+import { connection } from './database';
+import mysql, { PoolConnection, Pool } from 'mysql2/promise';
 
 function computeMarketMean(startDate: string, endDate: string, marketMeans: {[date:string]: number}): number {
   const start = DateTime.fromISO(startDate).startOf('day')
@@ -20,6 +22,100 @@ function computeMarketMean(startDate: string, endDate: string, marketMeans: {[da
 }
 
 export async function report(taxes: boolean, comsissions: boolean) {
+  const conn = await connection();
+  try {
+      return await reportWithConnection(conn, taxes, comsissions)
+  } finally {
+      conn.release();
+  }
+}
+
+async function reportWithConnection(conn: PoolConnection, taxes: boolean, comsissions: boolean) {
+  // 1. Get open positions
+  const ibAPI = new IbAPI();
+  if (!await ibAPI.isAuthenticated()) {
+    return { success: false, error: 'Unauthenticated' };
+  }
+  const periodsRequest = await fetch('http://192.168.0.150:8000/periods');
+  const periods = await periodsRequest.json();
+
+  console.log('begin');
+  const [orders, ] : [any, any] = await conn.query<mysql.QueryResult>(`
+    SELECT 
+      count(*) as count,
+      avg(sell_order_price/buy_order_price) as gains1,
+        avg(sell_position_price/buy_position_price) as gains2,
+        status,
+        date,
+        model_name 
+    FROM broker.order group by status,date, model_name
+    ORDER BY date desc `
+  );
+  console.log('end');
+  console.log(orders.length);
+  console.log(orders[0])
+
+  const marketMeans: any = {};
+  for (const period of periods) {
+    marketMeans[period.date] = period.mean;
+  }
+
+  const result: any = {};
+
+  for (const order of orders) {
+    const key = order.date.toISOString() + ' ' + order.model_name;
+    console.log(key)
+    if (!result.hasOwnProperty(key)) {
+      result[key] = [];
+    }
+    result[key].push(order);
+  }
+
+  const result2: any = [];
+  for (const key in result) {
+    let price = 0;
+    let count = 0;
+    let total = 0;
+    let marketMean = 0;
+    let failed = 0;
+    let discarded = 0;
+    let opening = 0;
+    let duplicated = 0;
+    let modelName = null;
+    let date = null;
+    for (const order of result[key]) {
+      date = DateTime.fromJSDate(order.date).toISODate();
+      modelName = order.model_name;
+      if (order.gains1) {
+        price += order.gains1;
+        count += order.count;
+        // marketMean += computeMarketMean(order.date, order.date, marketMeans);
+      }
+      if (order.status !== 'failed' || order.description && order.description.indexOf('Cancelled')>=0) {
+        total += order.count;
+      }
+      if (order.status === 'failed') {
+        failed += order.count;
+      }
+      if (order.status === 'discarded') {
+        discarded += order.count;
+      }
+      if (order.status === 'duplicated') {
+        duplicated += order.count;
+      }
+      if (order.status === 'opening') {
+        opening += order.count;
+      }
+    }
+    result2.push({date, gain: price/count, marketMean: marketMean/count, count, failed, discarded, total, opening, duplicated, modelName});
+  }
+
+  result2.sort( (a:any, b:any) => a.date < b.date ? 1 : -1);
+
+  return result2;
+}
+
+export async function report2(taxes: boolean, comsissions: boolean) {
   // 1. Get open positions
   const ibAPI = new IbAPI();
   if (!await ibAPI.isAuthenticated()) {

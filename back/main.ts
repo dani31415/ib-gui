@@ -11,11 +11,13 @@ import { snapshot } from './src/snapshot';
 import { order, orders } from './src/orders';
 import { simulationData } from './src/simulation-data';
 import { simulationDataN } from './src/simulation-data-n';
-import { report, simulation } from './src/report';
+import { report, report2, simulation } from './src/report';
 import { train, trainProcess, trainRun, trainSummary } from './src/train';
 import { jobs, job } from './src/jobs';
 import { symbol } from './src/symbol';
 import { day } from './src/day';
+import { items } from './src/items';
+import { realtime } from './src/realtime';
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
@@ -308,6 +310,19 @@ app.get('/api/report', async (req, res) => {
   }
 });
 
+app.get('/api/report2', async (req, res) => {
+  try {
+    console.log('Connection done!');
+    const taxes = req.query.taxes === 'true'
+    const commissions = req.query.commissions === 'true'
+
+    const reportResult = await report2(taxes, commissions);
+    res.send({success: true, report: reportResult});
+  } catch (ex: any) {
+    res.status(400).send({ error: ex.message ?? 'Error.' });
+  }
+});
+
 app.get('/api/train/process', async (req, res) => {
   try {
     console.log('Connection done!');
@@ -372,6 +387,26 @@ app.get('/api/days/:date', async (req, res) => {
   }
 });
 
+app.get('/api/items/:name/:date', async (req, res) => {
+  try {
+    console.log('Connection done!');
+    const result = await items(req.params.name, req.params.date);
+    res.send({success: true, items: result });
+  } catch (ex: any) {
+    res.status(400).send({ error: ex.message ?? 'Error.' });
+  }
+});
+
+app.get('/api/realtime/:name/:date', async (req, res) => {
+  try {
+    console.log('Connection done!');
+    const result = await realtime(req.params.name, req.params.date);
+    res.send({success: true, realtime: result });
+  } catch (ex: any) {
+    res.status(400).send({ error: ex.message ?? 'Error.' });
+  }
+});
+
 app.use(express.static('public'));
 app.get('/positions*', function(req, res) {
   res.sendFile('index.html', {root: __dirname + '/public/'});
@@ -391,6 +426,10 @@ app.get('/jobs*', function(req, res) {
 });
 
 app.get('/train*', function(req, res) {
+  res.sendFile('index.html', {root: __dirname + '/public/'});
+});
+
+app.get('/days*', function(req, res) {
   res.sendFile('index.html', {root: __dirname + '/public/'});
 });
 
