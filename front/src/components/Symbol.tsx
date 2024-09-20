@@ -17,6 +17,7 @@ export default function Symbol() {
     const [market, setMarket] : [any[], any] = useState([]);
     const [marketLH, setMarketLH] : [any[], any] = useState([]);
     const [marketRealtime, setMarketRealtime] : [any[], any] = useState([]);
+    const [symbolId, setSymbolId] : [number, any] = useState(0);
 
     let { symbol, date } = useParams();
 
@@ -64,6 +65,7 @@ export default function Symbol() {
             console.log('error')
           }
           if (json.success) {
+            setSymbolId(json.symbol.symbol_id);
             console.log('orders', json.symbol.orders)
             const dataS = [];
             const dataB = [];
@@ -108,6 +110,7 @@ export default function Symbol() {
 
 
     return (
+    <div>
       <ComposedChart width={1200} height={300}>
         <CartesianGrid stroke="#ccc"/>
         <Scatter dataKey="sell" fill='red' line={true} isAnimationActive={false} data={dataS}/>
@@ -126,7 +129,8 @@ export default function Symbol() {
         <XAxis type='number' dataKey="x" domain={[(dataMin:number) => Math.floor(dataMin-20), (dataMax:number) => Math.ceil(dataMax+20)]}/>
         <YAxis type='number' domain={domainFunc} unit='$'/>
         <ZAxis type="number" range={[0,100]} dataKey="z" />
-    </ComposedChart>
-    )
+      </ComposedChart>
+    <span>{ symbolId }</span>
+    </div>)
   }
   
