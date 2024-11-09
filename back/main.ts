@@ -12,7 +12,7 @@ import { order, orders } from './src/orders';
 import { simulationData } from './src/simulation-data';
 import { simulationDataN } from './src/simulation-data-n';
 import { report, report2, simulation } from './src/report';
-import { train, trainProcess, trainRun, trainSummary } from './src/train';
+import { train, trainProcess, trainRun, trainSummary, result } from './src/train';
 import { jobs, job } from './src/jobs';
 import { symbol } from './src/symbol';
 import { day } from './src/day';
@@ -356,6 +356,18 @@ app.get('/api/train/summary', async (req, res) => {
   }
 });
 
+app.get('/api/train/result', async (req, res) => {
+  try {
+    console.log('Connection done!');
+    const name = req.query.name as string
+    const period = req.query.period as string
+    const trainResult = await result(name, period);
+    res.send({success: true, result: trainResult});
+  } catch (ex: any) {
+    res.status(400).send({ error: ex.message ?? 'Error.' });
+  }
+});
+
 app.get('/api/train', async (req, res) => {
   try {
     console.log('Connection done!');
@@ -408,6 +420,8 @@ app.get('/api/realtime/:name/:date', async (req, res) => {
 });
 
 app.use(express.static('public'));
+app.use('/api/static', express.static('static'));
+
 app.get('/positions*', function(req, res) {
   res.sendFile('index.html', {root: __dirname + '/public/'});
 });

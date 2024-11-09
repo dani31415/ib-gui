@@ -12,6 +12,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogActions from '@mui/material/DialogActions';
 import Button from '@mui/material/Button';
+import { useNavigate } from 'react-router-dom';
 
 export default function Train() {
   const [train, setTrain] = useState([]);
@@ -20,6 +21,7 @@ export default function Train() {
   const [summaryLine, setSummaryLine] = useState<any>({});
   const [text, setText] = useState('');
   const [openSummaryDialog, setOpenSummaryDialog] = useState(false);
+  const navigate = useNavigate();
 
   const ellipsis = {width:'125px', display:'block', textOverflow:'ellipsis', overflow:'hidden'};
 
@@ -120,6 +122,10 @@ export default function Train() {
     return s;
   }
 
+  function openRow(name: string, period: number) {
+    navigate(`/train/${name}/${period}`);
+  }
+
   function dec4(x: number) {
     const y = Math.round(x*10000)/10000;
     let s = y.toString();
@@ -167,7 +173,7 @@ return (<div>
         </TableHead>
         <TableBody>
         { train.map( t => (
-          <TableRow>
+          <TableRow hover onClick={() => openRow(t['name']+t['variant']+'-'+t['iteration'], t['end_period'])}>
             <TableCell sx={style(t)}>{ t['name'] }<br></br>{t['end_period']} {t['variant']}-{t['iteration']}</TableCell>
             <TableCell  sx={style(t)}>{ t['modified'] ?? ''}</TableCell>
             <TableCell  sx={style(t)}>{ status(t) }<br></br>{ info(t) }<br></br>{ gpu(t) } </TableCell>

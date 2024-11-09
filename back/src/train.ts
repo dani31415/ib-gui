@@ -43,3 +43,13 @@ export async function trainRun() {
     console.log('end run');
     return 'ok';
 }
+
+export async function result(name: string, period: string) {
+    await connect();
+    console.log('begin run');
+    const s = await ssh.exec('bash', ['-c', `source .env/bin/activate && python -m main.graph ${name} ${period}`], { cwd: '/home/user/trading' });
+    await ssh.getFile('./static/fig.png', '/home/user/trading/.tmp/fig.png')
+    console.log(s);
+    console.log('end run');
+    return JSON.parse(s);
+}
