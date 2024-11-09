@@ -46,6 +46,7 @@ function closeOrder(orders: any[], newOrder: any, order: any, oldOrder: any, clo
         }
         orders.push( {
             id: oldOrder.id,
+            model_name: oldOrder.model_name,
             side: oldOrder.side,
             price: oldOrder.price,
             quantity: oldOrder.quantity,
@@ -70,8 +71,8 @@ export async function symbol(name: string, date: string) {
 }
 
 export async function symbolWithConnection(conn: PoolConnection, name: string, date: string) {
-    const [result, ] : [any, any] = await conn.query<mysql.QueryResult>('SELECT * FROM symbol WHERE short_name=? AND not disabled ORDER BY id DESC', name);
-    const symbol_id = result[0].id;
+    const [symbols, ] : [any, any] = await conn.query<mysql.QueryResult>('SELECT * FROM symbol WHERE short_name=? AND not disabled ORDER BY id DESC', name);
+    const symbol_id = symbols[0].id;
 
     // const today = DateTime.now().toISODate();
     const [dbOrders, ] : [any, any] = await conn.query<mysql.QueryResult>(`
@@ -80,6 +81,7 @@ export async function symbolWithConnection(conn: PoolConnection, name: string, d
             broker.ib_order.side as side,
             broker.order.quantity as purchase_total_quantity,
             broker.order.bought_quantity as sell_total_quantity,
+            broker.order.model_name as model_name,
             broker.ib_order_change.quantity as quantity_change,
             broker.ib_order_change.price as price_change,
             broker.ib_order_change.created_at as created_at,
@@ -104,6 +106,7 @@ export async function symbolWithConnection(conn: PoolConnection, name: string, d
         console.log(created_at.diff(open, 'minutes').minutes);
         const newOrder = {
             id:  order.id,
+            model_name: order.model_name,
             side: order.side,
             price: order.price_change,
             quantity: order.side=='B' ? order.purchase_total_quantity : order.sell_total_quantity,
@@ -119,5 +122,5 @@ export async function symbolWithConnection(conn: PoolConnection, name: string, d
 
     closeOrder(orders, null, null, oldOrder, closed_at, open)
 
-    return { symbol_id, orders };
+    return { symbol: symbols[0], orders };
 }

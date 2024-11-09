@@ -17,16 +17,17 @@ export default function Symbol() {
     const [market, setMarket] : [any[], any] = useState([]);
     const [marketLH, setMarketLH] : [any[], any] = useState([]);
     const [marketRealtime, setMarketRealtime] : [any[], any] = useState([]);
-    const [symbolId, setSymbolId] : [number, any] = useState(0);
+    const [symbol, setSymbol] : [any, any] = useState({});
+    const [models, setModels] : [string[], any] = useState([]);
 
-    let { symbol, date } = useParams();
+    let { ticker, date } = useParams();
 
     // const data = [{x: 100, y: 400}, {x: 400, y: 800}, {x: null, y: NaN}, {x: 300, y: 300}, {x: 500, y: 700},];
     useEffect( () => {
         async function action() {
-          const response = await fetch(`/api/symbols/${symbol}/${date}`);
-          const itemsResponse = await fetch(`/api/items/${symbol}/${date}`);
-          const realtimeResponse = await fetch(`/api/realtime/${symbol}/${date}`);
+          const response = await fetch(`/api/symbols/${ticker}/${date}`);
+          const itemsResponse = await fetch(`/api/items/${ticker}/${date}`);
+          const realtimeResponse = await fetch(`/api/realtime/${ticker}/${date}`);
           const json = await response.json();
           const items = await itemsResponse.json();
           const realtime = await realtimeResponse.json();
@@ -65,11 +66,13 @@ export default function Symbol() {
             console.log('error')
           }
           if (json.success) {
-            setSymbolId(json.symbol.symbol_id);
+            setSymbol(json.symbol.symbol);
             console.log('orders', json.symbol.orders)
+            const models = [];
             const dataS = [];
             const dataB = [];
             for (const order of json.symbol.orders) {
+                var model_name = order.model_name;
                 let p: any = {
                     x: round2(order.minute),
                     z: order.remaining != order.quantity ? 100:0,
@@ -88,6 +91,7 @@ export default function Symbol() {
                         z: NaN,
                     }
                     if (order.side == 'S') {
+                        models.push(model_name);
                         p.sell = NaN;
                         dataS.push(p);
                     } else {
@@ -98,6 +102,7 @@ export default function Symbol() {
             }
             setDataB(dataB);
             setDataS(dataS);
+            setModels(models);
             console.log(dataB);
             console.log(dataS);
           } else {
@@ -130,7 +135,10 @@ export default function Symbol() {
         <YAxis type='number' domain={domainFunc} unit='$'/>
         <ZAxis type="number" range={[0,100]} dataKey="z" />
       </ComposedChart>
-    <span>{ symbolId }</span>
+    <div>Ticker: <strong>{ ticker }</strong></div>
+    <div>DB id: <strong>{ symbol.id }</strong></div>
+    <div>IB id: <strong>{ symbol.ib_conid }</strong></div>
+    <div> { models.map( model => <div>{ model }</div> )} </div>
     </div>)
   }
   
