@@ -18,6 +18,7 @@ import { symbol } from './src/symbol';
 import { day } from './src/day';
 import { items } from './src/items';
 import { realtime } from './src/realtime';
+import { freespace } from './src/freespace';
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
@@ -414,6 +415,16 @@ app.get('/api/realtime/:name/:date', async (req, res) => {
     console.log('Connection done!');
     const result = await realtime(req.params.name, req.params.date);
     res.send({success: true, realtime: result });
+  } catch (ex: any) {
+    res.status(400).send({ error: ex.message ?? 'Error.' });
+  }
+});
+
+app.get('/api/freespace', async (req, res) => {
+  try {
+    console.log('Connection done!');
+    const result = await freespace();
+    res.send({success: true, freespace: result });
   } catch (ex: any) {
     res.status(400).send({ error: ex.message ?? 'Error.' });
   }
