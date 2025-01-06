@@ -85,6 +85,8 @@ export async function symbolWithConnection(conn: PoolConnection, name: string, d
             broker.ib_order_change.quantity as quantity_change,
             broker.ib_order_change.price as price_change,
             broker.ib_order_change.created_at as created_at,
+            broker.ib_order_change.status as status,
+            broker.ib_order_change.type as type,
             broker.ib_order.closed_at as closed_at,
             null
         FROM broker.order 
@@ -107,14 +109,16 @@ export async function symbolWithConnection(conn: PoolConnection, name: string, d
         const newOrder = {
             id:  order.id,
             model_name: order.model_name,
-            side: order.side,
+            side: order.side + (order.type == 'STP' ? '+STP' : ''),
             price: order.price_change,
             quantity: order.side=='B' ? order.purchase_total_quantity : order.sell_total_quantity,
             remaining: order.quantity_change,
             created_at: order.created_at,
             minute: minutesFrom(toDateTime(order.created_at), open),
+            status: (order.status == 'Filled' || order.status == 'Cancelled') ? 'closed': undefined,
         }
-        closeOrder(orders, newOrder, order, oldOrder, closed_at, open)
+        // console.log(order.id)
+        // closeOrder(orders, newOrder, order, oldOrder, closed_at, open)
         orders.push(newOrder);
         oldOrder = newOrder;
         closed_at = toDateTime(order.closed_at);

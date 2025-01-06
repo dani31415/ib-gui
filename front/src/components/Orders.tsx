@@ -50,7 +50,7 @@ export default function Positions() {
   function setOrders(orders: any[]) {
     const filledOrders: any[] = [];
     const submittedOrders: any[] = [];
-    const cancelleddOrders: any[] = [];
+    const cancelledOrders: any[] = [];
     for (const order of orders) {
       if (order.status == 'Submitted' || order.status == 'PreSubmitted') {
         submittedOrders.push(order);

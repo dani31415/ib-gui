@@ -13,6 +13,7 @@ function domainFunc( [m, M] : [number, number], allowedDataOverflow: boolean): [
 
 export default function Symbol() {
     const [dataS, setDataS] : [any[], any] = useState([]);
+    const [dataSS, setDataSS] : [any[], any] = useState([]);
     const [dataB, setDataB] : [any[], any] = useState([]);
     const [market, setMarket] : [any[], any] = useState([]);
     const [marketLH, setMarketLH] : [any[], any] = useState([]);
@@ -70,19 +71,23 @@ export default function Symbol() {
             console.log('orders', json.symbol.orders)
             const models = [];
             const dataS = [];
+            const dataSS = [];
             const dataB = [];
             for (const order of json.symbol.orders) {
                 var model_name = order.model_name;
                 let p: any = {
                     x: round2(order.minute),
-                    z: order.remaining != order.quantity ? 100:0,
+                    z: order.remaining < order.quantity ? 100:0,
                 }
                 if (order.side == 'S') {
                     p.sell = round2(order.price)
                     dataS.push(p);
-                } else {
+                } else if (order.side == 'B') {
                     p.buy = round2(order.price)
                     dataB.push(p);
+                } else if (order.side == 'S+STP') {
+                    p.sellStop = round2(order.price)
+                    dataSS.push(p);
                 }
 
                 if (order.status=='closed') {
@@ -94,14 +99,18 @@ export default function Symbol() {
                         models.push(model_name);
                         p.sell = NaN;
                         dataS.push(p);
-                    } else {
+                    } else if (order.side == 'B') {
                         p.buy = NaN;
                         dataB.push(p);
-                    }
+                    } else if (order.side == 'S+STP') {
+                        p.sellStop = NaN;
+                        dataSS.push(p);
+                  }
                 }
             }
             setDataB(dataB);
             setDataS(dataS);
+            setDataSS(dataSS);
             setModels(models);
             console.log(dataB);
             console.log(dataS);
@@ -119,6 +128,7 @@ export default function Symbol() {
       <ComposedChart width={1200} height={300}>
         <CartesianGrid stroke="#ccc"/>
         <Scatter dataKey="sell" fill='red' line={true} isAnimationActive={false} data={dataS}/>
+        <Scatter dataKey="sellStop" fill='orange' line={true} isAnimationActive={false} data={dataSS}/>
         <Scatter dataKey="buy" fill='blue' line={true} isAnimationActive={false} data={dataB}/>
         <Scatter dataKey="y" fill='gray' line={true} isAnimationActive={false} data={market}/>
         <Scatter dataKey="y" fill='gray' line={true} isAnimationActive={false} data={marketRealtime}/>
