@@ -73,11 +73,16 @@ export default function Symbol() {
             const dataS = [];
             const dataSS = [];
             const dataB = [];
+            const ids: string[] = [];
             for (const order of json.symbol.orders) {
                 var model_name = order.model_name;
                 let p: any = {
                     x: round2(order.minute),
                     z: order.remaining < order.quantity ? 100:0,
+                }
+                if (order.side == 'B' && !ids.includes(order.id)) {
+                  ids.push(order.id);
+                  models.push(model_name);
                 }
                 if (order.side == 'S') {
                     p.sell = round2(order.price)
@@ -96,7 +101,6 @@ export default function Symbol() {
                         z: NaN,
                     }
                     if (order.side == 'S') {
-                        models.push(model_name);
                         p.sell = NaN;
                         dataS.push(p);
                     } else if (order.side == 'B') {
