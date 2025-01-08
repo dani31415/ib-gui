@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
@@ -18,18 +18,20 @@ function round2(x: number|null): number|null {
 export default function Day() {
     const [orders, setOrders] : [any[], any] = useState([]);
     const navigate = useNavigate();
+    let [searchParams, setSearchParams] = useSearchParams();
 
     let { date } = useParams();
 
+
     function openRow(id: string) {
-      navigate(`/days/${date}/symbols/${id}`);
+      navigate(`/days/${date}/symbols/${id}?model=${searchParams.get('model')}`);
     }
 
     // const data = [{x: 100, y: 400}, {x: 400, y: 800}, {x: null, y: NaN}, {x: 300, y: 300}, {x: 500, y: 700},];
     useEffect( () => {
         async function action() {
           let response;
-          response = await fetch(`/api/days/${date}`);
+          response = await fetch(`/api/days/${date}?model=${searchParams.get('model')}`);
           const json = await response.json();
           if (json.success) {
             console.log(json.day);

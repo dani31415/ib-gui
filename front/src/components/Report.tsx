@@ -166,8 +166,8 @@ export default function Report() {
     return 'white';
   }
 
-  function openRow(date: string) {
-    navigate(`/days/${date}`);
+  function openRow(date: string, model: string) {
+    navigate(`/days/${date}?model=${model}`);
   }
 
 return (<div>
@@ -215,7 +215,7 @@ return (<div>
         </TableHead>
         <TableBody>
         { report.map( item => (
-          <TableRow style={ {background: color(item)} } hover onClick={() => openRow(item['date'])}>
+          <TableRow style={ {background: color(item)} } hover onClick={() => openRow(item['date'], item['modelName'])}>
             <TableCell>{ item['date'] }</TableCell>
             <TableCell>{ dec(item['gain']) }</TableCell>
             <TableCell>{ dec(item['marketMean']) }</TableCell>

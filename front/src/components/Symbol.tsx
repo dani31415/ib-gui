@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { Area, Scatter, CartesianGrid, XAxis, YAxis, ZAxis, ComposedChart, Tooltip } from 'recharts';
 
 function round2(x: number): number {
@@ -19,14 +19,15 @@ export default function Symbol() {
     const [marketLH, setMarketLH] : [any[], any] = useState([]);
     const [marketRealtime, setMarketRealtime] : [any[], any] = useState([]);
     const [symbol, setSymbol] : [any, any] = useState({});
-    const [models, setModels] : [string[], any] = useState([]);
+    const [models, setModels] : [any[], any] = useState([]);
+    let [searchParams, setSearchParams] = useSearchParams();
 
     let { ticker, date } = useParams();
 
     // const data = [{x: 100, y: 400}, {x: 400, y: 800}, {x: null, y: NaN}, {x: 300, y: 300}, {x: 500, y: 700},];
     useEffect( () => {
         async function action() {
-          const response = await fetch(`/api/symbols/${ticker}/${date}`);
+          const response = await fetch(`/api/symbols/${ticker}/${date}?model=${searchParams.get('model')}`);
           const itemsResponse = await fetch(`/api/items/${ticker}/${date}`);
           const realtimeResponse = await fetch(`/api/realtime/${ticker}/${date}`);
           const json = await response.json();
@@ -82,7 +83,7 @@ export default function Symbol() {
                 }
                 if (order.side == 'B' && !ids.includes(order.id)) {
                   ids.push(order.id);
-                  models.push(model_name);
+                  models.push({model_name, db_id: order.db_id, id: order.id});
                 }
                 if (order.side == 'S') {
                     p.sell = round2(order.price)
@@ -152,7 +153,7 @@ export default function Symbol() {
     <div>Ticker: <strong>{ ticker }</strong></div>
     <div>DB id: <strong>{ symbol.id }</strong></div>
     <div>IB id: <strong>{ symbol.ib_conid }</strong></div>
-    <div> { models.map( model => <div>{ model }</div> )} </div>
+    <div> { models.map( model => <div>{ model.model_name } ({ model.db_id })</div> )} </div>
     </div>)
   }
   

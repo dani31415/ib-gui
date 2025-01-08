@@ -61,23 +61,31 @@ function closeOrder(orders: any[], newOrder: any, order: any, oldOrder: any, clo
 // CREATE USER 'view'@'192.168.%.%' IDENTIFIED BY '34k89aftl9345.adb';
 // GRANT SELECT ON market.* TO 'view'@'192.168.%.%';
 // GRANT SELECT ON broker.* TO 'view'@'192.168.%.%';
-export async function symbol(name: string, date: string) {
+export async function symbol(name: string, date: string, model?: string) {
     const conn = await connection();
     try {
-        return symbolWithConnection(conn, name, date)
+        return symbolWithConnection(conn, name, date, model)
     } finally {
         conn.release();
     }
 }
 
-export async function symbolWithConnection(conn: PoolConnection, name: string, date: string) {
+export async function symbolWithConnection(conn: PoolConnection, name: string, date: string, model?: string) {
     const [symbols, ] : [any, any] = await conn.query<mysql.QueryResult>('SELECT * FROM symbol WHERE short_name=? AND not disabled ORDER BY id DESC', name);
     const symbol_id = symbols[0].id;
+
+    var model_where = '';
+    var params = [symbol_id, date];
+    if (model) {
+        model_where = 'AND broker.order.model_name = ?'
+        params.push(model)
+    }
 
     // const today = DateTime.now().toISODate();
     const [dbOrders, ] : [any, any] = await conn.query<mysql.QueryResult>(`
         SELECT
             broker.ib_order.id as id,
+            broker.ib_order.order_id as db_id,
             broker.ib_order.side as side,
             broker.order.quantity as purchase_total_quantity,
             broker.order.bought_quantity as sell_total_quantity,
@@ -93,8 +101,9 @@ export async function symbolWithConnection(conn: PoolConnection, name: string, d
         INNER JOIN broker.ib_order ON broker.order.id = broker.ib_order.order_id
         INNER JOIN broker.ib_order_change ON broker.ib_order.id = broker.ib_order_change.ib_order_id
         WHERE symbol_id=? AND date=?
+              ${model_where}
         ORDER BY broker.ib_order_change.created_at ASC
-    `, [symbol_id, date]);
+    `, params);
 
     const inputDate = DateTime.fromISO(date);
     const open = DateTime.local(inputDate.year,inputDate.month,inputDate.day,9,0,0,{zone:'America/New_York'});
@@ -108,6 +117,7 @@ export async function symbolWithConnection(conn: PoolConnection, name: string, d
         console.log(created_at.diff(open, 'minutes').minutes);
         const newOrder = {
             id:  order.id,
+            db_id: order.db_id,
             model_name: order.model_name,
             side: order.side + (order.type == 'STP' ? '+STP' : ''),
             price: order.price_change,
@@ -124,7 +134,7 @@ export async function symbolWithConnection(conn: PoolConnection, name: string, d
         closed_at = toDateTime(order.closed_at);
     }
 
-    closeOrder(orders, null, null, oldOrder, closed_at, open)
+    // closeOrder(orders, null, null, oldOrder, closed_at, open)
 
     return { symbol: symbols[0], orders };
 }
