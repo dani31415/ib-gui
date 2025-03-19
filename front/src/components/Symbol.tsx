@@ -11,6 +11,19 @@ function domainFunc( [m, M] : [number, number], allowedDataOverflow: boolean): [
     return [Math.floor(m-0.1*d),Math.ceil(M+0.1*d)];
 }
 
+function doContinue(data: any[], field: string, maxX:number) {
+    if (data.length>0 && !isNaN(data[data.length-1][field])) {
+        console.log('aha!!');
+        var p = {...data[data.length-1]}
+        if (maxX > p.x) {
+          p.x = maxX;
+        } else {
+          p.x += 5;
+        }
+        data.push(p);
+    }
+}
+
 export default function Symbol() {
     const [dataS, setDataS] : [any[], any] = useState([]);
     const [dataSS, setDataSS] : [any[], any] = useState([]);
@@ -34,6 +47,7 @@ export default function Symbol() {
           const json = await response.json();
           const items = await itemsResponse.json();
           const realtime = await realtimeResponse.json();
+          var maxX = 0;
           if (items.success) {
             const market = [];
             const marketLH = [];
@@ -48,6 +62,7 @@ export default function Symbol() {
                     y: [round2(row.low), round2(row.high)],
                     z: 0,
                 })
+                maxX = Math.max(round2(row.minute), maxX);
             }
             setMarket(market);
             setMarketLH(marketLH);
@@ -62,6 +77,7 @@ export default function Symbol() {
                     y: round2(row.last),
                     z: 0,
                 })
+                maxX = Math.max(round2(row.minute), maxX);
             }
             console.log('marketRealtime', marketRealtime);
             setMarketRealtime(marketRealtime);
@@ -83,6 +99,7 @@ export default function Symbol() {
                     x: round2(order.minute),
                     z: order.remaining < order.quantity ? 100:0,
                 }
+                maxX = Math.max(p.x, maxX)
                 if (!ids.includes(order.db_id)) {
                   ids.push(order.db_id);
                   models.push({model_name, db_id: order.db_id, id: order.id});
@@ -121,6 +138,10 @@ export default function Symbol() {
                   }
                 }
             }
+            doContinue(dataB, 'buy', maxX);
+            doContinue(dataS, 'sell', maxX);
+            doContinue(dataSS, 'sellStop', maxX);
+            doContinue(dataBS, 'buyStop', maxX);
             setDataB(dataB);
             setDataS(dataS);
             setDataSS(dataSS);
