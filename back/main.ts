@@ -8,7 +8,7 @@ import ibReauthenticate from './src/ib-reauthenticate';
 import httpProxy from 'http-proxy';
 import { internalOrders } from './src/internal-order';
 import { snapshot } from './src/snapshot';
-import { order, orders } from './src/orders';
+import { order, orders, trades } from './src/orders';
 import { simulationData } from './src/simulation-data';
 import { simulationDataN } from './src/simulation-data-n';
 import { report, report2, simulation } from './src/report';
@@ -185,6 +185,16 @@ app.get('/api/positions2', async (req, res) => {
     console.log('Connection done!');
     const result = await positions2();
     res.send({success:true, positions:result});
+  } catch (ex: any) {
+    res.status(400).send({ error: ex.message ?? 'Error.' });
+  }
+});
+
+app.get('/api/orders/:orderid/trades', async (req, res) => {
+  try {
+    console.log('Connection done!');
+    const result = await trades(req.params.orderid);
+    res.send({success: true, trades: result});
   } catch (ex: any) {
     res.status(400).send({ error: ex.message ?? 'Error.' });
   }

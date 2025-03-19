@@ -24,11 +24,29 @@ function doContinue(data: any[], field: string, maxX:number) {
     }
 }
 
+function findClosest(p: any, dataB: any[]) : any|null {
+  var q = null;
+  for (var d of dataB) {
+      if (d.remaining < d.quantity) {
+          if (q == null) {
+              q = d;
+          } else if (Math.abs(d.minute-p.x)<Math.abs(q.minute-p.x)) {
+              q = d;
+          }
+      }
+  }
+  return q;
+}
+
 export default function Symbol() {
     const [dataS, setDataS] : [any[], any] = useState([]);
     const [dataSS, setDataSS] : [any[], any] = useState([]);
     const [dataB, setDataB] : [any[], any] = useState([]);
     const [dataBS, setDataBS] : [any[], any] = useState([]);
+    const [tradeB, setTradeB] : [any[], any] = useState([]);
+    const [tradeS, setTradeS] : [any[], any] = useState([]);
+    const [tradeBS, setTradeBS] : [any[], any] = useState([]);
+    const [tradeSS, setTradeSS] : [any[], any] = useState([]);
     const [market, setMarket] : [any[], any] = useState([]);
     const [marketLH, setMarketLH] : [any[], any] = useState([]);
     const [marketRealtime, setMarketRealtime] : [any[], any] = useState([]);
@@ -92,12 +110,16 @@ export default function Symbol() {
             const dataSS = [];
             const dataB = [];
             const dataBS = [];
+            const tradeB = [];
+            const tradeS = [];
+            const tradeBS = [];
+            const tradeSS = [];
             const ids: string[] = [];
             for (const order of json.symbol.orders) {
                 var model_name = order.model_name;
                 let p: any = {
                     x: round2(order.minute),
-                    z: order.remaining < order.quantity ? 100:0,
+                    z: 0, // order.remaining < order.quantity ? 50:0,
                 }
                 maxX = Math.max(p.x, maxX)
                 if (!ids.includes(order.db_id)) {
@@ -147,6 +169,40 @@ export default function Symbol() {
             setDataSS(dataSS);
             setDataBS(dataBS);
             setModels(models);
+            for (var id of ids) {
+              const tradesResponse = await fetch(`/api/orders/${id}/trades`);
+              const trades = await tradesResponse.json();
+              for (const trade of trades.trades) {
+                let p: any = {
+                  x: round2(trade.minuteSincePreOpen),
+                  z: 100,
+                }
+                if (trade.side == 'B') {
+                  var q = findClosest(p, json.symbol.orders)
+                  if (q && q.side == 'B+STP') {
+                    p.buyStop = trade.price;
+                    tradeBS.push(p);
+                  } else {
+                    p.buy = trade.price;
+                    tradeB.push(p);
+                  }
+                }
+                if (trade.side == 'S') {
+                  var q = findClosest(p, json.symbol.orders)
+                  if (q && q.side == 'S+STP') {
+                    p.sellStop = trade.price;
+                    tradeSS.push(p);
+                  } else {
+                    p.sell = trade.price;
+                    tradeS.push(p);
+                  }
+                }
+              }
+            }
+            setTradeB(tradeB);
+            setTradeS(tradeS);
+            setTradeBS(tradeBS);
+            setTradeSS(tradeSS);
             console.log(dataB);
             console.log(dataS);
           } else {
@@ -162,10 +218,16 @@ export default function Symbol() {
     <div>
       <ComposedChart width={1200} height={300}>
         <CartesianGrid stroke="#ccc"/>
-        <Scatter dataKey="sell" fill='red' line={true} isAnimationActive={false} data={dataS}/>
-        <Scatter dataKey="sellStop" fill='orange' line={true} isAnimationActive={false} data={dataSS}/>
         <Scatter dataKey="buy" fill='blue' line={true} isAnimationActive={false} data={dataB}/>
         <Scatter dataKey="buyStop" fill='green' line={true} isAnimationActive={false} data={dataBS}/>
+        <Scatter dataKey="sell" fill='red' line={true} isAnimationActive={false} data={dataS}/>
+        <Scatter dataKey="sellStop" fill='orange' line={true} isAnimationActive={false} data={dataSS}/>
+
+        <Scatter dataKey="buy" fill='blue' line={false} isAnimationActive={false} data={tradeB}/>
+        <Scatter dataKey="buyStop" fill='green' line={false} isAnimationActive={false} data={tradeBS}/>        
+        <Scatter dataKey="sell" fill='red' line={false} isAnimationActive={false} data={tradeS}/>
+        <Scatter dataKey="sellStop" fill='orange' line={false} isAnimationActive={false} data={tradeSS}/>
+
         <Scatter dataKey="y" fill='gray' line={true} isAnimationActive={false} data={market}/>
         <Scatter dataKey="y" fill='gray' line={true} isAnimationActive={false} data={marketRealtime}/>
         <Area

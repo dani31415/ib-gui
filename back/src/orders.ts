@@ -25,3 +25,9 @@ export async function order(orderId: string) {
   return order;
 }
 
+export async function trades(orderId: string) {
+  const orderRequest = await fetch(`http://192.168.0.150:8000/orders/${orderId}/trades`);
+  const order = await orderRequest.json();
+  return order;
+}
+
