@@ -21,6 +21,21 @@ function computeMarketMean(startDate: string, endDate: string, marketMeans: {[da
   return mean;
 }
 
+function computeMarketMean2(modelName: string, startDate: string, endDate: string, marketMeans: any[]): number {
+  const start = DateTime.fromISO(startDate).startOf('day')
+  const end = DateTime.fromISO(endDate).startOf('day');
+  let mean: number = 1;
+  for (let date = start; date == start || date.diff(end).toMillis() < 0; date = date.plus({day:1})) {
+    const dateStr = date.toISODate();
+    for (const marketMean of marketMeans) {
+      if (marketMean.date == dateStr && marketMean.modelName == modelName) {
+        mean *= marketMean.mean;
+      }
+    }
+  }
+  return mean;
+}
+
 export async function report(taxes: boolean, comsissions: boolean) {
   const conn = await connection();
   try {
@@ -38,6 +53,9 @@ async function reportWithConnection(conn: PoolConnection, taxes: boolean, comsis
   }
   const periodsRequest = await fetch('http://192.168.0.150:8000/periods');
   const periods = await periodsRequest.json();
+
+  const meansRequest = await fetch('http://192.168.0.150:8000/means');
+  const means = await meansRequest.json();
 
   const [orders, ] : [any, any] = await conn.query<mysql.QueryResult>(`
     SELECT 
@@ -85,7 +103,8 @@ async function reportWithConnection(conn: PoolConnection, taxes: boolean, comsis
         price += order.count*order.gains1;
         count += order.count;
         const strDate = order.date.toISOString();
-        marketMean += order.count*computeMarketMean(strDate, strDate, marketMeans);
+        // marketMean += order.count*computeMarketMean(strDate, strDate, marketMeans);
+        marketMean += order.count*computeMarketMean2(modelName, strDate, strDate, means);
       }
       if (order.status !== 'failed' || order.description && order.description.indexOf('Cancelled')>=0) {
         total += order.count;
