@@ -203,7 +203,6 @@ export async function simulation(modelName: string) {
   for (const order of orders) {
     for (const simitem of simitems) {
       if (order.status!='duplicated' && order.date === simitem.date && order.order==simitem.order && order.minute == simitem.minute) {
-        console.log(order.status);
         if (order.buyOrderPrice && order.sellOrderPrice) {
           orderCount += 1;
           orderGains += order.sellOrderPrice / order.buyOrderPrice;
