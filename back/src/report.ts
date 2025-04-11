@@ -202,7 +202,8 @@ export async function simulation(modelName: string) {
   let orderGains = 0;
   for (const order of orders) {
     for (const simitem of simitems) {
-      if (order.date === simitem.date && order.order==simitem.order && order.minute == simitem.minute) {
+      if (order.status!='duplicated' && order.date === simitem.date && order.order==simitem.order && order.minute == simitem.minute) {
+        console.log(order.status);
         if (order.buyOrderPrice && order.sellOrderPrice) {
           orderCount += 1;
           orderGains += order.sellOrderPrice / order.buyOrderPrice;
@@ -224,11 +225,19 @@ export async function simulation(modelName: string) {
       }
     }
   }
+  let totalSimCount = 0;
+  let totalSimGains = 0;
+  for (const simitem of simitems) {
+    if (simitem.gains) {
+      totalSimCount += 1;
+      totalSimGains += simitem.gains;
+    }
+  }
   let g = 0;
   let c = 0;
   for (const r of result) {
     g += r.orderGains / r.simGains;
     c += 1;
   }
-  return {'ratio': g/c, 'match': bothCount/simCount, simGains: simGains/simCount, orderGains: orderGains/orderCount};
+  return {'ratio': g/c, 'match': bothCount/simCount, simGains: simGains/simCount, orderGains: orderGains/orderCount, totalSimGains: totalSimGains / totalSimCount};
 }

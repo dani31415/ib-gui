@@ -121,7 +121,7 @@ export default function Report() {
           console.log(result);
           model.sim = Math.round(1000*result.simulation.ratio)/10;
           model.match = Math.round(100*result.simulation.match);
-          model.simGains = result.simulation.simGains;
+          model.simGains = result.simulation.totalSimGains;
           if (model.sim != 0) {
             changed = true;
           }
@@ -182,9 +182,9 @@ return (<div>
           <TableRow>
             <TableCell>Model</TableCell>
             <TableCell>Gain</TableCell>
+            <TableCell>%sim</TableCell>
             <TableCell>Market</TableCell>
             <TableCell>Sim</TableCell>
-            <TableCell>%sim</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -192,9 +192,10 @@ return (<div>
           <TableRow style={ {background: color(item) }}>
             <TableCell style={ {fontSize:'70%'} }>{prefix(item.modelName)}<br></br>{postfix(item.modelName)}<br></br>{ item.date }</TableCell>
             <TableCell>{ dec(item.gain) }</TableCell>
+            <TableCell>{ item.sim == 0 ? '-':<span>{dec(item.sim)}</span>}</TableCell>
             <TableCell>{ dec(item.mean) }</TableCell>
             <TableCell>{ item.simGains == 0 ? '-':<span>{dec(item.simGains)}</span>}</TableCell>
-            <TableCell>{ item.sim == 0 ? '-':<span>{dec(item.sim)}</span>}</TableCell>
+            
           </TableRow>
         ))}
         </TableBody>

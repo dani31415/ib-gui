@@ -31,6 +31,7 @@ export async function dayWithConnection(conn: PoolConnection, date: string, mode
             left join broker.simulations 
             on broker.order.date = simulations.date and broker.order.minute=simulations.minute and broker.order.order=simulations.order and broker.order.model_name=simulations.model_name
             where broker.order.date = ? 
+                AND status != 'duplicated'
                 ${model_where}
             group by symbol_src_name
             order by gains1 desc, buy_order_price desc, gains2 desc, symbol_src_name
