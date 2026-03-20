@@ -64,9 +64,14 @@ export class IbAPI {
         // changes += orderInfo.bidPrice !== undefined ? 1 : 0;
         // changes += orderInfo.askPrice !== undefined ? 1 : 0;
         // changes += orderInfo.openPrice !== undefined ? 1 : 0;
-        result[idx] = orderInfo;
+
+        // snapshot endpoint does not return the result with the same order
+        for (const idx0 in conids) {
+          if (conids[idx0] == snapshot.conid) {
+            result[idx0] = orderInfo;
+          }
+        }
       }
-      console.log(changes);
       if (changes === 1 * conids.length || attempts === 10) {
         done = true;
       } else if (changes0 < changes) {
@@ -79,9 +84,6 @@ export class IbAPI {
       }
       changes0 = changes;
     } while (!done);
-    for (const i in result) {
-      console.log(conids[i], result[i]);
-    }
     return result;
   }
   

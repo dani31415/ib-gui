@@ -19,6 +19,7 @@ import { day } from './src/day';
 import { items } from './src/items';
 import { realtime } from './src/realtime';
 import { freespace } from './src/freespace';
+import { model } from './src/model';
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
@@ -316,6 +317,16 @@ app.get('/api/report', async (req, res) => {
 
     const reportResult = await report(taxes, commissions);
     res.send({success: true, report: reportResult});
+  } catch (ex: any) {
+    res.status(400).send({ error: ex.message ?? 'Error.' });
+  }
+});
+
+app.get('/api/model/:model', async (req, res) => {
+  try {
+    console.log('Connection done! model');
+    const modelResult = await model(req.params.model);
+    res.send({success: true, model: modelResult});
   } catch (ex: any) {
     res.status(400).send({ error: ex.message ?? 'Error.' });
   }

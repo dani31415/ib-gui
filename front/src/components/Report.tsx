@@ -170,6 +170,10 @@ export default function Report() {
     navigate(`/days/${date}?model=${model}`);
   }
 
+  function openModel(model: string) {
+    navigate(`/model/${model}`);
+  }
+
 return (<div>
     <FormGroup>
       <Box>
@@ -189,7 +193,7 @@ return (<div>
         </TableHead>
         <TableBody>
         { modelSummary.map( item => (
-          <TableRow style={ {background: color(item) }}>
+          <TableRow style={ {background: color(item) }} onClick={() => openModel(item.modelName)}>
             <TableCell style={ {fontSize:'70%'} }>{prefix(item.modelName)}<br></br>{postfix(item.modelName)}<br></br>{ item.date }</TableCell>
             <TableCell>{ dec(item.gain) }</TableCell>
             <TableCell>{ item.sim == 0 ? '-':<span>{dec(item.sim)}</span>}</TableCell>

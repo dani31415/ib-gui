@@ -15,6 +15,7 @@ import Train from "./components/Train";
 import Symbol from "./components/Symbol";
 import Day from "./components/Day";
 import TrainResult from "./components/TrainResult";
+import Model from "./components/Model";
 
 function App() {
   return (
@@ -36,6 +37,7 @@ function App() {
               <Route path="train/:name/:period" element={<TrainResult />} />
               <Route path="days/:date/symbols/:ticker" element={<Symbol />} />
               <Route path="days/:date" element={<Day />} />
+              <Route path="model/:model" element={<Model />} />
             </Route>
           </Routes>
         </header>

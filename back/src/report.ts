@@ -215,10 +215,53 @@ export async function simulation(modelName: string) {
   const simitems = await simitemsRequest.json();
   const result: any[] = [];
   let orderCount = 0;
+  let orderSameDaysCount = 0;
   let simCount = 0;
+  let simSameCount = 0;
+  let orderSameCount = 0;
+  let simCountNoPurchase = 0;
+  let simAllCount = 0;
   let bothCount = 0;
   let simGains = 0;
+  let simSameGains = 0;
+  let orderSameGains = 0;
+  let simAllGains = 0;
+  let simAllCountNoPurchase = 0;
   let orderGains = 0;
+  let orderSameDaysGains = 0;
+  let validDate;
+  for (const order of orders) {
+    validDate = false;
+    for (const simitem of simitems) {
+      if (order.date === simitem.date) {
+        validDate = true;
+      }
+    }
+    if (validDate) {
+      if (order.buyOrderPrice && order.sellOrderPrice) {
+        orderSameDaysCount += 1;
+        orderSameDaysGains += order.sellOrderPrice / order.buyOrderPrice;
+      }
+    }
+  }
+
+  for (const simitem of simitems) {
+    validDate = false;
+    for (const order of orders) {
+      if (order.date === simitem.date) {
+        validDate = true;
+      }
+    }
+    if (validDate) {
+      if (simitem.gains) {
+        simAllCount += 1;
+        simAllGains += simitem.gains;
+      } else {
+        simAllCountNoPurchase += 1;
+      }
+    }
+  }
+
   for (const order of orders) {
     for (const simitem of simitems) {
       if (order.status!='duplicated' && order.date === simitem.date && order.order==simitem.order && order.minute == simitem.minute) {
@@ -229,8 +272,14 @@ export async function simulation(modelName: string) {
         if (simitem.gains) {
           simCount += 1;
           simGains += simitem.gains;
+        } else {
+          simCountNoPurchase += 1;
         }
         if (order.buyOrderPrice && order.sellOrderPrice && simitem.gains) {
+          simSameCount += 1;
+          simSameGains += simitem.gains;
+          orderSameCount += 1;
+          orderSameGains += order.sellOrderPrice / order.buyOrderPrice;
           bothCount += 1;
           result.push({
             date: order.date,
@@ -257,5 +306,17 @@ export async function simulation(modelName: string) {
     g += r.orderGains / r.simGains;
     c += 1;
   }
-  return {'ratio': g/c, 'match': bothCount/simCount, simGains: simGains/simCount, orderGains: orderGains/orderCount, totalSimGains: totalSimGains / totalSimCount};
+  return {
+    'ratio': g/c,
+    'match': bothCount/simCount,
+    simSameGains: simSameGains/simSameCount,
+    simGains: simGains/simCount,
+    simSuccess: simCount / (simCount + simCountNoPurchase),
+    simAllGains: simAllGains/simAllCount,
+    simAllSuccess: simAllCount / (simAllCount + simAllCountNoPurchase),
+    orderSameDaysGains: orderSameDaysGains/orderSameDaysCount,
+    orderGains: orderGains/orderCount,
+    orderSameGains: orderSameGains/orderSameCount,
+    totalSimGains: totalSimGains / totalSimCount
+  };
 }
