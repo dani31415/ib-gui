@@ -96,6 +96,8 @@ export async function symbolWithConnection(conn: PoolConnection, name: string, d
             broker.ib_order_change.status as status,
             broker.ib_order_change.type as type,
             broker.ib_order.closed_at as closed_at,
+            broker.order.order as order_value,
+            broker.order.sell_order_price/broker.order.buy_order_price as gains,
             null
         FROM broker.order 
         INNER JOIN broker.ib_order ON broker.order.id = broker.ib_order.order_id
@@ -126,6 +128,8 @@ export async function symbolWithConnection(conn: PoolConnection, name: string, d
             created_at: order.created_at,
             minute: minutesFrom(toDateTime(order.created_at), open),
             status: (order.status == 'Filled' || order.status == 'Cancelled') ? 'closed': undefined,
+            order: order.order_value,
+            gains: order.gains,
         }
         // console.log(order.id)
         // closeOrder(orders, newOrder, order, oldOrder, closed_at, open)

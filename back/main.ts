@@ -20,6 +20,7 @@ import { items } from './src/items';
 import { realtime } from './src/realtime';
 import { freespace } from './src/freespace';
 import { model } from './src/model';
+import { simulations } from './src/simulations';
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
@@ -304,6 +305,20 @@ app.get('/api/simulation3', async (req, res) => {
     } else {
       res.send({error: 'Missing modelName.'});
     }
+  } catch (ex: any) {
+    res.status(400).send({ error: ex.message ?? 'Error.' });
+  }
+});
+
+app.get('/api/simulations', async (req, res) => {
+  try {
+    console.log('Connection done!');
+    const simulationsResult = await simulations(
+      req.query.symbol as string,
+      req.query.date as string,
+      req.query.model as string,
+    );
+    res.send({success: true, simulations: simulationsResult});
   } catch (ex: any) {
     res.status(400).send({ error: ex.message ?? 'Error.' });
   }

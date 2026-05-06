@@ -6,6 +6,13 @@ function round2(x: number): number {
     return Math.round(x*100)/100;
 }
 
+function dec4(x: number): number {
+    if (x==null) {
+      return x;
+    }
+    return Math.round(x*10000)/10000;
+}
+
 function domainFunc( [m, M] : [number, number], allowedDataOverflow: boolean): [number, number] {
     const d = M-m;
     return [Math.floor(m-0.1*d),Math.ceil(M+0.1*d)];
@@ -52,9 +59,12 @@ export default function Symbol() {
     const [marketRealtime, setMarketRealtime] : [any[], any] = useState([]);
     const [symbol, setSymbol] : [any, any] = useState({});
     const [models, setModels] : [any[], any] = useState([]);
+    const [simulations, setSimulations] : [any[], any] = useState([]);
     let [searchParams, setSearchParams] = useSearchParams();
 
     let { ticker, date } = useParams();
+
+    let trades = []
 
     // const data = [{x: 100, y: 400}, {x: 400, y: 800}, {x: null, y: NaN}, {x: 300, y: 300}, {x: 500, y: 700},];
     useEffect( () => {
@@ -62,9 +72,13 @@ export default function Symbol() {
           const response = await fetch(`/api/symbols/${ticker}/${date}?model=${searchParams.get('model') ?? ''}`);
           const itemsResponse = await fetch(`/api/items/${ticker}/${date}`);
           const realtimeResponse = await fetch(`/api/realtime/${ticker}/${date}`);
+          const simulationsResponse = await fetch(`/api/simulations?model=${searchParams.get('model')}&date=${date}&symbol=${ticker}`);
           const json = await response.json();
           const items = await itemsResponse.json();
           const realtime = await realtimeResponse.json();
+          const simulations = await simulationsResponse.json();
+          setSimulations(simulations.simulations)
+          console.log(simulations);
           var maxX = 0;
           if (items.success) {
             const market = [];
@@ -105,7 +119,7 @@ export default function Symbol() {
           if (json.success) {
             setSymbol(json.symbol.symbol);
             console.log('orders', json.symbol.orders)
-            const models = [];
+            const models : any[] = [];
             const dataS = [];
             const dataSS = [];
             const dataB = [];
@@ -124,7 +138,7 @@ export default function Symbol() {
                 maxX = Math.max(p.x, maxX)
                 if (!ids.includes(order.db_id)) {
                   ids.push(order.db_id);
-                  models.push({model_name, db_id: order.db_id, id: order.id});
+                  models.push({model_name, db_id: order.db_id, id: order.id, trades: [], minute: order.minute, order: order.order, gains: order.gains });
                 }
                 if (order.side == 'S') {
                     p.sell = round2(order.price)
@@ -168,7 +182,7 @@ export default function Symbol() {
             setDataS(dataS);
             setDataSS(dataSS);
             setDataBS(dataBS);
-            setModels(models);
+            // var trades = {};
             for (var id of ids) {
               const tradesResponse = await fetch(`/api/orders/${id}/trades`);
               const trades = await tradesResponse.json();
@@ -197,8 +211,18 @@ export default function Symbol() {
                     tradeS.push(p);
                   }
                 }
+                for (var model of models) {
+                  if (model.db_id == trade.orderId) {
+                    model.trades.push(trade);
+                  }
+                }
+                // if (trades[trade.orderId] == undefined) {
+                //   trades[trade.orderId] = [];
+                // }
+                // trades[trade.orderId].push(trade)
               }
             }
+            setModels(models);
             setTradeB(tradeB);
             setTradeS(tradeS);
             setTradeBS(tradeBS);
@@ -246,7 +270,17 @@ export default function Symbol() {
     <div>Ticker: <strong>{ ticker }</strong></div>
     <div>DB id: <strong>{ symbol.id }</strong></div>
     <div>IB id: <strong>{ symbol.ib_conid }</strong></div>
-    <div> { models.map( model => <div>{ model.model_name } ({ model.db_id })</div> )} </div>
+    <b>Real</b>
+    <div> { models.map( model => 
+      <div>{ Math.floor(model.minute) }: { model.model_name } ({ model.db_id }) order={ model.order }, gains={ dec4(model.gains) }
+        { model.trades.map( (trade: any) => <div>&nbsp;&nbsp;<i>Trade</i>: { trade.tradeTime } { trade.minuteSincePreOpen } {trade.price} </div> )} 
+      </div> 
+    )} </div>
+    <b>Simulation</b>
+    <div> { simulations.map( simulation => 
+      <div>{ Math.floor(simulation.minute+10) }: { simulation.model_name } ({ simulation.id }) gains={simulation.gains}
+      </div> 
+    )} </div>
     </div>)
   }
   
